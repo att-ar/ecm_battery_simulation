@@ -1,0 +1,4 @@
+matplotlib
+schemdraw
+numpy
+pandas
