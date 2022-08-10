@@ -59,8 +59,7 @@ with sidebar:  # the sidebar of the GUI
         max_I = st.number_input(
                     label = "Select most positive current wanted (A)",
                     value = 1.0, min_value = 0.0)
-    assert(abs(min_I) < capacity / 5, "Current cannot exceed C/5")
-    assert(abs(max_I) < capacity / 5, "Current cannot exceed C/5")
+        
     start = st.checkbox(label="Check to Run Simulation")
 
 def generate_ocv_curve(ocv: list):
@@ -194,6 +193,8 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
     return df_sim
 
 if start:
+    assert(abs(min_I) < capacity / 5, "Current cannot exceed C/5")
+    assert(abs(max_I) < capacity / 5, "Current cannot exceed C/5")
     current = np.array((max_I - min_I) * np.random.random_sample(24) + min_I).round(2)
     df_sim = simulate(capacity, current, ocv = ocv, r_int = r_int,
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
