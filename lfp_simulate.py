@@ -59,8 +59,8 @@ with sidebar:  # the sidebar of the GUI
         max_I = st.number_input(
                     label = "Select most positive current wanted (A)",
                     value = 1.0, min_value = 0.0)
-    assert(abs(min_I) < capacity / 5)
-    assert(abs(max_I) < capacity / 5)
+    assert(abs(min_I) < capacity / 5, "Current cannot exceed C/5")
+    assert(abs(max_I) < capacity / 5, "Current cannot exceed C/5")
     start = st.checkbox(label="Check to Run Simulation")
 
 def generate_ocv_curve(ocv: list):
