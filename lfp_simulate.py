@@ -90,7 +90,7 @@ def lfp_cell(capacity: float, delta_t: float,
              **kwargs):
     assert isinstance(current, np.ndarray)
     assert isinstance(soc, np.ndarray)
-    model_v = pd.Series(ocv, name="Model-V")
+    model_v = pd.Series(name="Model-V",dtype="float64")
     u_rc = np.zeros((2,))
 
     r = np.array([kwargs["r_1"], kwargs["r_2"]])
