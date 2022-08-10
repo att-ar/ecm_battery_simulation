@@ -14,6 +14,8 @@ But I will also add a Jupyter notebook with a rolling Jupyter plot. <br>
 
 $2^{nd}$ order:
 
+<img src = "https://github.com/att-ar/ecm_battery_simulation/blob/main/The-circuit-of-the-second-order-RC-model.png" height = "200" width = "400"/>
+
 $$ U_{1,k+1} = exp(-\Delta t/\tau_1)\cdot U_{1,k} + R_1[1 - exp(-\Delta t/\tau_1)]\cdot I_k $$
 
 $$ U_{2,k+1} = exp(-\Delta t/\tau_2)\cdot U_{2,k} + R_2[1 - exp(-\Delta t/\tau_2)]\cdot I_k $$
