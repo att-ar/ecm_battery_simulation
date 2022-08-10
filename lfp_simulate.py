@@ -41,7 +41,7 @@ with sidebar:  # the sidebar of the GUI
 
     ocv = st.text_input(
         label="10 OCV values from 100 to 10 SOC separated by commas:")
-    "Example of OCV input: 3.557, 3.459, ..., 3.222, 3.198"
+    "Example OCV: 3.557, 3.459, ..., 3.222, 3.198"
     if len(ocv) > 0:
         ocv = ocv.split(",")
         assert len(ocv) == 10, "Need 10 OCV values"
@@ -54,11 +54,11 @@ with sidebar:  # the sidebar of the GUI
     with cur[0]:
         min_I = st.number_input(
                     label = "Select most negative current wanted (A)",
-                    value = -1.0, max = 0.0)
+                    value = -1.0, max_value = 0.0)
     with cur[1]:
         max_I = st.number_input(
                     label = "Select most positive current wanted (A)",
-                    value = 1.0, min = 0.0)
+                    value = 1.0, min_value = 0.0)
     assert(abs(min_I) < capacity / 5)
     assert(abs(max_I) < capacity / 5)
     start = st.checkbox(label="Check to Run Simulation")
