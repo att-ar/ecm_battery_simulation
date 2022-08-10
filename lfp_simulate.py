@@ -98,7 +98,7 @@ def lfp_cell(capacity: float, delta_t: float,
 
     _, ocv = generate_ocv_curve(kwargs["ocv"])
 
-    for i in current.index:
+    for i in range(len(current)):
         if (soc[i] >= 99.9 and current[i] > 0.0) or \
            (soc[i] <= 5.3 and current[i] < 0.0):
 
