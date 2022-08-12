@@ -80,6 +80,7 @@ def model_2rc(current, delta_t, u_rc, ocv, r_int, r, c):
 
 def lfp_cell(capacity: float, delta_t: float,
              current: np.ndarray, soc: np.ndarray,
+             progress,
              **kwargs):
     assert isinstance(current, np.ndarray)
     assert isinstance(soc, np.ndarray)
@@ -90,8 +91,6 @@ def lfp_cell(capacity: float, delta_t: float,
     c = np.array([kwargs["c_1"], kwargs["c_2"]])
 
     _, ocv = generate_ocv_curve(kwargs["ocv"])
-    
-    progress = st.progress(0)
 
     for i in range(len(current)):
         progress.progress(i + 1)
@@ -123,7 +122,7 @@ def lfp_cell(capacity: float, delta_t: float,
                               "soc": soc})
 
 
-def simulate(capacity, current, delta_t=1.0, **kwargs):
+def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
     '''
     float[, float], **kwargs -> pd.DataFrame, .csv file
 
@@ -136,6 +135,8 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
     `current` np.ndarray
         current profile to be used
         the array should only be around 20 values long
+    `progress` st.progress() object
+        Just a progress bar from the streamlit API
     `delta_t` float
         the time between data points (this is important for the ECM model)
         the value of the `delta_t` will be static
@@ -176,6 +177,7 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
                       delta_t,
                       df_sim["current"].values,
                       df_sim["soc"].values,
+                      progress,
                       ocv=kwargs["ocv"],
                       r_int=kwargs["r_int"],
                       r_1=kwargs["r_1"],
@@ -197,7 +199,10 @@ if start:
     assert(abs(min_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     assert(abs(max_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     current = np.array((max_I - min_I) * np.random.random_sample(24) + min_I).round(2)
-    df_sim = simulate(capacity, current, ocv = ocv, r_int = r_int,
+    
+    progress = st.progress(0)
+        
+    df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
                      )
     with schemdraw.Drawing() as s:
