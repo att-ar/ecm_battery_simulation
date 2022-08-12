@@ -209,7 +209,7 @@ if start:
         lst = [[r_1,c_1],[r_2,c_2]]
         s.config(unit = 2)
         s.add( V := elm.SourceV()).label("LFP Cell")
-        s.add( R_internal := R(label = str(round( 1000 * r_int,3)) + "mΩ"))
+        s.add( R_internal := R(label = str(round( 1000 * r_int,3)) + " mΩ"))
         s += elm.Line().right()
         s += elm.Dot()
         for i in range(len(lst)):
@@ -255,12 +255,14 @@ if start:
     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b--")
     ax[1].set_title("Voltage vs Time")
     ax[1].set_ylim([1,4])
-    ax[1].set_yticks(np.arange(1,4,0.6))
+    ax[1].set_yticks(np.arange(1.6,4.2,0.6))
     
     ax[2].set_ylabel("Current (A)", fontsize = 12 )
     ax[2].set_xlabel("Time (sec)", fontsize = 12)
     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "r--")
     ax[2].set_title("Current vs Time")
-    ax[2].set_yticks(list(range(int(min_I),int(max_I),4)))
+    ax[2].set_yticks(list(range(int(min_I),
+                                int(max_I + 1),
+                                int((max_I - min_I) / 5))))
     fig.tight_layout()
     st.pyplot(fig)
