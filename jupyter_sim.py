@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.polynomial import Polynomial as Poly
 import pandas as pd
+from time import sleep
 
 from jupyterplot import ProgressPlot as PP
 
@@ -13,7 +14,7 @@ def generate_ocv_curve(ocv: np.ndarray):
     generates soc -> ocv mapping polynomial of degree 8
     and outputs ocv values at all unit soc values from 100% to 10%
     '''
-    assert isinstance(ocv, np.ndarray)
+    assert isinstance(ocv, np.ndarray) or isinstance(ocv, list)
     soc = np.arange(100,0,-10)
     assert len(ocv) == len(soc)
     assert len(ocv) == 10
@@ -35,9 +36,16 @@ def lfp_cell(capacity: float, delta_t: float,
              **kwargs):
     assert isinstance(current, np.ndarray)
     assert isinstance(soc, np.ndarray)
-    assert "data" in kwargs.keys()
-    for col in ["ocv","r_int","r_1","r_2","c_1","c_2"]:
-        assert col in kwargs["data"].columns
+    if "data" in kwargs.keys():
+        for col in ["ocv","r_int","r_1","r_2","c_1","c_2"]:
+            assert col in kwargs["data"].columns
+            
+        _, ocv = generate_ocv_curve(kwargs["data"]["ocv"].values)
+        
+    else:
+        r = np.array([kwargs["r_1"], kwargs["r_2"]])
+        c = np.array([kwargs["c_1"], kwargs["c_2"]])
+        _, ocv = generate_ocv_curve(kwargs["ocv"])
 
     pp = PP(plot_names = ["SOC v Time", "Model Voltage v Time", "Current v Time"],
              line_names = ["Modeled Data"],
@@ -50,8 +58,6 @@ def lfp_cell(capacity: float, delta_t: float,
 
     model_v = pd.Series(name="Model-V",dtype="float64")
     u_rc = np.zeros((2,))
-
-    _, ocv = generate_ocv_curve(kwargs["data"]["ocv"].values)
 
     for i in range(len(current)):
         if (soc[i] >= 99.8 and current[i] > 0.0) or \
@@ -71,22 +77,32 @@ def lfp_cell(capacity: float, delta_t: float,
         use_soc_ocv = round(soc[i], 0)
         use_soc = round(soc[i], -1)
 
-        # for the params dataframe rounds to nearest ten
-        model_v.loc[i], u_rc = model_2rc(current[i],
+        if "data" in kwargs.keys():
+            # for the params dataframe rounds to nearest ten
+            model_v.loc[i], u_rc = model_2rc(current[i],
+                                             delta_t,
+                                             u_rc,
+                                             ocv[int(100 - use_soc_ocv)],
+                                             kwargs["data"].loc[use_soc,
+                                                                "r_int"],
+                                             kwargs["data"].loc[use_soc,
+                                                                ["r_1", "r_2"]].values,
+                                             kwargs["data"].loc[use_soc,
+                                                                ["c_1", "c_2"]].values
+                                             )
+        else:
+            model_v.loc[i], u_rc = model_2rc(current[i],
                                          delta_t,
                                          u_rc,
                                          ocv[int(100 - use_soc_ocv)],
-                                         kwargs["data"].loc[use_soc,
-                                                            "r_int"],
-                                         kwargs["data"].loc[use_soc,
-                                                            ["r_1", "r_2"]].values,
-                                         kwargs["data"].loc[use_soc,
-                                                            ["c_1", "c_2"]].values
-                                         )
-        pp.update(delta_t * i,
-                  [ [soc[i]],
-                    [model_v.loc[i]],
-                    [current[i]] ])
+                                         kwargs["r_int"],
+                                         r,
+                                         c)
+        if i % 5 == 0:
+            pp.update(delta_t * i,
+                      [ [soc[i]],
+                        [model_v.loc[i]],
+                        [current[i]] ])
 
     pp.finalize()
 
