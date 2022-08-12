@@ -208,31 +208,26 @@ if start:
         D = {}
         lst = [[r_1,c_1],[r_2,c_2]]
         s.config(unit = 2)
-        s.add( Dot1 := elm.Dot())
         s.add( V := elm.SourceV()).label("LFP Cell")
-        s += elm.Dot()
         s.add( R_internal := R(label = str(round( 1000 * r_int,3)) + "mΩ"))
         s += elm.Line().right()
         s += elm.Dot()
         for i in range(len(lst)):
             s.push()
-            s += elm.Line().down().dot()
+            s += elm.Line().down()
             s += R().label(label = f"R{i+1}: " + str(round(1000 * lst[i][0], 3)) + " mΩ",
             loc = "bottom"
-            ).right().dot()
+            ).right()
             s += elm.Line().up()
             D[i] = elm.Dot()
             s += D[i]
             s.pop()
             s.push()
-            s += elm.Line().up().dot()
+            s += elm.Line().up()
             s.add( elm.Capacitor(label = f"C{i+1}: " + str(round(lst[i][1], 3)) + " F").right())
-            s += elm.Dot()
-            s += elm.Line().down().dot()
             s.pop()
             s += elm.Line().at(D[i].start).right()
         s += elm.Line().toy(V.start)
-        s += elm.Dot()
         s += elm.SourceI(loc="bottom").left()
         s += elm.Line().tox(V.start)
 
@@ -263,6 +258,6 @@ if start:
     ax[2].set_xlabel("Time (sec)", fontsize = 12)
     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "r--")
     ax[2].set_title("Current vs Time")
-    ax[2].set_yticks(list(range(min_I,max_I,1)))
+    ax[2].set_yticks(list(range(int(min_I),int(max_I))))
     fig.tight_layout()
     st.pyplot(fig)
