@@ -242,7 +242,7 @@ if start:
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
                      )
     #plot
-    fig, ax = plt.subplots(3)
+    fig, ax = plt.subplots(3, sharex=True, figsize = (12,9))
     ax[0].set_ylabel("SOC (%)", fontsize = 12 )
     ax[0].set_xlabel("Time (sec)", fontsize = 12)
     ax[0].plot(df_sim["time"].values, df_sim["soc"].values, "r--")
@@ -255,14 +255,14 @@ if start:
     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b--")
     ax[1].set_title("Voltage vs Time")
     ax[1].set_ylim([1,4])
-    ax[1].set_yticks(np.arange(1.6,4.2,0.6))
+    ax[1].set_yticks(np.arange(1.0,4.1,0.6))
     
     ax[2].set_ylabel("Current (A)", fontsize = 12 )
     ax[2].set_xlabel("Time (sec)", fontsize = 12)
     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "r--")
     ax[2].set_title("Current vs Time")
     ax[2].set_yticks(list(range(int(min_I),
-                                int(max_I + 1),
-                                int((max_I - min_I) / 5))))
+                                int(max_I + 4),
+                                4)))
     fig.tight_layout()
     st.pyplot(fig)
