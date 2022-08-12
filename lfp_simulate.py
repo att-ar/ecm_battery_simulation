@@ -257,7 +257,7 @@ if start:
     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b--")
     ax[1].set_title("Voltage vs Time")
     ax[1].set_ylim([1,4])
-    ax[1].set_yticks(list(range(1,4,0.2)))
+    ax[1].set_yticks(np.arange(1,4,0.2))
     
     ax[2].set_ylabel("Current (A)", fontsize = 12 )
     ax[2].set_xlabel("Time (sec)", fontsize = 12)
