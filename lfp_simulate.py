@@ -137,8 +137,6 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
         the time between data points (this is important for the ECM model)
         the value of the `delta_t` will be static
     `kwargs`
-        Note if data in kwargs: there should be no other kwargs passed
-             if r_int, etc in kwargs: there should be no data argument passed
         `r_int` float
             the internal resistance of the lithium-ion cell
         `r_1` and `r_2` float and float
