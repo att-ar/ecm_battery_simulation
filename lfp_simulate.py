@@ -73,9 +73,9 @@ def model_2rc(current, delta_t, u_rc, ocv, r_int, r, c):
     # returns the new voltage and polarization voltage
     tau_i = r * c
     u_rc = np.exp(-delta_t / tau_i) * u_rc + r * \
-        (1 - np.exp(-delta_t / tau_i)) * (-current)
+        (1 - np.exp(-delta_t / tau_i)) * current
 
-    return ocv - r_int * (-current) - u_rc.sum(), u_rc
+    return ocv + r_int * current - u_rc.sum(), u_rc
 
 
 def lfp_cell(capacity: float, delta_t: float,
