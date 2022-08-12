@@ -193,8 +193,8 @@ if start:
             i = i.strip()
             assert i.replace(".","").isnumeric(), "Need numerical values"
         ocv = [float(val) for val in ocv]
-    assert(abs(min_I) < capacity / 5, "Current cannot exceed C/5")
-    assert(abs(max_I) < capacity / 5, "Current cannot exceed C/5")
+    assert(abs(min_I) < capacity / 1.2, "Current cannot exceed C/1.2")
+    assert(abs(max_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     current = np.array((max_I - min_I) * np.random.random_sample(24) + min_I).round(2)
     df_sim = simulate(capacity, current, ocv = ocv, r_int = r_int,
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
