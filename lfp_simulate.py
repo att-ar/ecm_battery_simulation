@@ -2,6 +2,8 @@ import schemdraw
 import schemdraw.elements as elm
 from schemdraw.elements import Resistor as R
 
+from tqdm import tqdm
+
 import streamlit as st
 import matplotlib.pyplot as plt
 
@@ -91,7 +93,7 @@ def lfp_cell(capacity: float, delta_t: float,
 
     _, ocv = generate_ocv_curve(kwargs["ocv"])
 
-    for i in range(len(current)):
+    for i in tqdm(range(len(current))):
         if (soc[i] >= 99.9 and current[i] > 0.0) or \
            (soc[i] <= 5.3 and current[i] < 0.0):
 
@@ -237,10 +239,12 @@ if start:
     ax[0].set_xlabel("Time (sec)", fontsize = 12)
     ax[0].plot(df_sim["time"].values, df_sim["soc"].values, "r--")
     ax[0].set_title("SOC vs Time")
+    ax[0].set_ylim([0,100])
     ax[1].set_ylabel("Voltage (V)", fontsize = 12)
     ax[1].set_xlabel("Time (sec)", fontsize = 12)
     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b--")
     ax[1].set_title("Voltage vs Time")
+    ax[1].set_ylim([2,4])
     ax[2].set_ylabel("Current (A)", fontsize = 12 )
     ax[2].set_xlabel("Time (sec)", fontsize = 12)
     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "r--")
