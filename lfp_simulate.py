@@ -2,8 +2,6 @@ import schemdraw
 import schemdraw.elements as elm
 from schemdraw.elements import Resistor as R
 
-from tqdm import tqdm
-
 import streamlit as st
 import matplotlib.pyplot as plt
 
@@ -92,8 +90,11 @@ def lfp_cell(capacity: float, delta_t: float,
     c = np.array([kwargs["c_1"], kwargs["c_2"]])
 
     _, ocv = generate_ocv_curve(kwargs["ocv"])
+    
+    progress = st.progress(0)
 
-    for i in tqdm(range(len(current))):
+    for i in range(len(current)):
+        progress.progress(i + 1)
         if (soc[i] >= 99.9 and current[i] > 0.0) or \
            (soc[i] <= 5.3 and current[i] < 0.0):
 
