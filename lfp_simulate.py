@@ -202,10 +202,8 @@ if start:
     
     "Progress Bar:"
     progress = st.progress(0)
-        
-    df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
-                      r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
-                     )
+    
+    #circuit
     with schemdraw.Drawing() as s:
         D = {}
         lst = [[r_1,c_1],[r_2,c_2]]
@@ -240,26 +238,31 @@ if start:
 
         image = s.get_imagedata("jpg")
     st.image(image)
-
+    
+    #sim
+    df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
+                      r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
+                     )
+    #plot
     fig, ax = plt.subplots(3)
     ax[0].set_ylabel("SOC (%)", fontsize = 12 )
     ax[0].set_xlabel("Time (sec)", fontsize = 12)
     ax[0].plot(df_sim["time"].values, df_sim["soc"].values, "r--")
     ax[0].set_title("SOC vs Time")
     ax[0].set_ylim([0,105])
-    ax[0].set_yticks(5)
+    ax[0].set_yticks(list(range(0,105,5)))
     
     ax[1].set_ylabel("Voltage (V)", fontsize = 12)
     ax[1].set_xlabel("Time (sec)", fontsize = 12)
     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b--")
     ax[1].set_title("Voltage vs Time")
     ax[1].set_ylim([1,4])
-    ax[1].set_yticks(0.2)
+    ax[1].set_yticks(list(range(1,4,0.2)))
     
     ax[2].set_ylabel("Current (A)", fontsize = 12 )
     ax[2].set_xlabel("Time (sec)", fontsize = 12)
     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "r--")
     ax[2].set_title("Current vs Time")
-    ax[2].set_yticks(1)
+    ax[2].set_yticks(list(range(min_I,max_I,1)))
     fig.tight_layout()
     st.pyplot(fig)
