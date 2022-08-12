@@ -2,4 +2,3 @@ matplotlib
 schemdraw
 numpy
 pandas
-tqdm
