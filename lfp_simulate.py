@@ -17,19 +17,19 @@ st.markdown("Open Sidebar for Static ECM Parameterization.")
 sidebar = st.sidebar
 with sidebar:  # the sidebar of the GUI
     "ECM Model Parameters:"
-    r_int = st.number_input(label="Internal Resistance mΩ") / 1000
+    r_int = st.number_input(label="Internal Resistance mΩ", value = 2.3) / 1000
     # RC-pairs for 2nd order ECM
     rc = st.columns(2)
     with rc[0]:
         r_1 = st.number_input(
-            label="Resistance of R1 mΩ", value=0.0) / 1000
+            label="Resistance of R1 mΩ", value=2.7) / 1000
         c_1 = st.number_input(
-            label="Capacitance of C1", value=0.0)
+            label="Capacitance of C1", value=12000)
     with rc[1]:
         r_2 = st.number_input(
-            label="Resistance of R2 mΩ", value=0.0) / 1000
+            label="Resistance of R2 mΩ", value=2.1) / 1000
         c_2 = st.number_input(
-            label="Capacitance of C2", value=0.0)
+            label="Capacitance of C2", value=120000)
 
     if not r_2:
         assert(r_1 != 0, "Change 1st RC pair first")
@@ -247,14 +247,19 @@ if start:
     ax[0].plot(df_sim["time"].values, df_sim["soc"].values, "r--")
     ax[0].set_title("SOC vs Time")
     ax[0].set_ylim([0,105])
+    ax[0].set_yticks(5)
+    
     ax[1].set_ylabel("Voltage (V)", fontsize = 12)
     ax[1].set_xlabel("Time (sec)", fontsize = 12)
     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b--")
     ax[1].set_title("Voltage vs Time")
     ax[1].set_ylim([1,4])
+    ax[1].set_yticks(0.2)
+    
     ax[2].set_ylabel("Current (A)", fontsize = 12 )
     ax[2].set_xlabel("Time (sec)", fontsize = 12)
     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "r--")
     ax[2].set_title("Current vs Time")
+    ax[2].set_yticks(1)
     fig.tight_layout()
     st.pyplot(fig)
