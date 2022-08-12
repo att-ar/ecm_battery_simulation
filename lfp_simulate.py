@@ -228,6 +228,8 @@ if start:
             s += elm.Line().down()
             s.pop()
             s += elm.Line().at(D[i].start).right()
+            if i == 0:
+                s += elm.Dot()
         s += elm.Line().toy(V.start)
         s += elm.SourceI(loc="bottom").left()
         s += elm.Line().tox(V.start)
