@@ -112,8 +112,17 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
         the time between data points (this is important for the ECM model)
         the value of the `delta_t` will be static
     `kwargs`
-        Note if data in kwargs: there should be no other kwargs passed
-             if r_int, etc in kwargs: there should be no data argument passed
+     Note if `data` in kwargs: there should be no other kwargs passed
+          if `r_int`, etc in kwargs: there should be no data argument passed
+        `r_int` float
+            the internal resistance of the lithium-ion cell
+        `r_1` and `r_2` float and float
+            the resistances of the 1st and 2nd order RC pairs respectively in Ohms
+        `c_1` and `c_2` float and float
+            the capacitances of the 1st and 2nd order RC pairs respectively
+        `ocv` list of floats
+            the ocv values at 100, 90, 80, ..., 20, 10% SOC
+            list should contain ten floating point values
 
         `data` pd.DataFrame
             DataFrame containing ECM paramaters at every 10% SOC
@@ -149,5 +158,21 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
                          df_sim["current"].values,
                          df_sim["soc"].values,
                          data=kwargs["data"])
+    else:
+        for i in ["r_int","r_1", "r_2","c_1", "c_2"]:
+            assert i in kwargs.keys()
+            
+        df_sim= lfp_cell(capacity,
+                      delta_t,
+                      df_sim["current"].values,
+                      df_sim["soc"].values,
+                      ocv=kwargs["ocv"],
+                      r_int=kwargs["r_int"],
+                      r_1=kwargs["r_1"],
+                      r_2=kwargs["r_2"],
+                      c_1=kwargs["c_1"],
+                      c_2=kwargs["c_2"])
+     
+    df_sim["time"] = [t * delta_t for t in range(len(df_sim))]
 
     return df_sim
