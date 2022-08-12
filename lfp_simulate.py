@@ -225,6 +225,7 @@ if start:
             s.push()
             s += elm.Line().up()
             s.add( elm.Capacitor(label = f"C{i+1}: " + str(round(lst[i][1], 3)) + " F").right())
+            s += elm.Line().down()
             s.pop()
             s += elm.Line().at(D[i].start).right()
         s += elm.Line().toy(V.start)
