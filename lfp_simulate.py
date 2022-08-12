@@ -73,7 +73,7 @@ def model_2rc(current, delta_t, u_rc, ocv, r_int, r, c):
     # returns the new voltage and polarization voltage
     tau_i = r * c
     u_rc = np.exp(-delta_t / tau_i) * u_rc + r * \
-        (1 - np.exp(-delta_t / tau_i)) * current
+        (1 - np.exp(-delta_t / tau_i)) * (-current)
 
     return ocv + r_int * current - u_rc.sum(), u_rc
 
@@ -200,6 +200,7 @@ if start:
     assert(abs(max_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     current = np.array((max_I - min_I) * np.random.random_sample(24) + min_I).round(2)
     
+    "Progress Bar:"
     progress = st.progress(0)
         
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
@@ -245,12 +246,12 @@ if start:
     ax[0].set_xlabel("Time (sec)", fontsize = 12)
     ax[0].plot(df_sim["time"].values, df_sim["soc"].values, "r--")
     ax[0].set_title("SOC vs Time")
-    ax[0].set_ylim([0,100])
+    ax[0].set_ylim([0,105])
     ax[1].set_ylabel("Voltage (V)", fontsize = 12)
     ax[1].set_xlabel("Time (sec)", fontsize = 12)
     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b--")
     ax[1].set_title("Voltage vs Time")
-    ax[1].set_ylim([2,4])
+    ax[1].set_ylim([1,4])
     ax[2].set_ylabel("Current (A)", fontsize = 12 )
     ax[2].set_xlabel("Time (sec)", fontsize = 12)
     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "r--")
