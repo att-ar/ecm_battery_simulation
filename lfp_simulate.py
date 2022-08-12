@@ -41,15 +41,8 @@ with sidebar:  # the sidebar of the GUI
 
     ocv = st.text_input(
         label="10 OCV values from 100 to 10 SOC separated by commas:")
-    "Example OCV: 3.557, 3.459, ..., 3.222, 3.198"
-    if len(ocv) > 0:
-        ocv = ocv.split(",")
-        assert len(ocv) == 10, "Need 10 OCV values"
-        for i in ocv:
-            i = i.strip()
-            assert i.replace(".","").isnumeric(), "Need numerical values"
-        ocv = [float(val) for val in ocv]
-
+    "Example OCV: 3.557, 3.394, ..., 3.222, 3.174"
+    
     cur = st.columns(2)
     with cur[0]:
         min_I = st.number_input(
@@ -193,6 +186,13 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
     return df_sim
 
 if start:
+    if len(ocv) > 0:
+        ocv = ocv.split(",")
+        assert len(ocv) == 10, "Need 10 OCV values"
+        for i in ocv:
+            i = i.strip()
+            assert i.replace(".","").isnumeric(), "Need numerical values"
+        ocv = [float(val) for val in ocv]
     assert(abs(min_I) < capacity / 5, "Current cannot exceed C/5")
     assert(abs(max_I) < capacity / 5, "Current cannot exceed C/5")
     current = np.array((max_I - min_I) * np.random.random_sample(24) + min_I).round(2)
