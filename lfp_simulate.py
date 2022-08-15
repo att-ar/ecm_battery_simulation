@@ -3,7 +3,9 @@ import schemdraw.elements as elm
 from schemdraw.elements import Resistor as R
 
 import streamlit as st
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+from plotly.subplots import make_subplots
+import plotly.express as px
 
 import numpy as np
 from numpy.polynomial import Polynomial as P
@@ -241,28 +243,58 @@ if start:
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
                      )
+    with sidebar:
+        @st.cache
+        def convert_df(df):
+            "convert pd.DataFrame to csv"
+            return df.to_csv(index=False).encode("utf-8")
+        csv = convert_df(df_sim)
+        display_df = st.button(label = "Display simulated data")
+        file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
+        st.download_button(
+            label = "Download data as CSV file",
+            data = df_sim,
+            file_name = file_name,
+            mime = "text/csv"
+        )
+    if display_df: st.dataframe(data = df_sim)
+            
     #plot
-    fig, ax = plt.subplots(3, sharex=True, figsize = (12,9))
-    ax[0].set_ylabel("SOC (%)", fontsize = 12 )
-    ax[0].set_xlabel("Time (sec)", fontsize = 12)
-    ax[0].plot(df_sim["time"].values, df_sim["soc"].values, "r-")
-    ax[0].set_title("SOC vs Time")
-    ax[0].set_ylim([0,105])
-    ax[0].set_yticks(list(range(0,105,20)))
+#     fig, ax = plt.subplots(3, sharex=True, figsize = (12,9))
+#     ax[0].set_ylabel("SOC (%)", fontsize = 12 )
+#     ax[0].set_xlabel("Time (sec)", fontsize = 12)
+#     ax[0].plot(df_sim["time"].values, df_sim["soc"].values, "r-")
+#     ax[0].set_title("SOC vs Time")
+#     ax[0].set_ylim([0,105])
+#     ax[0].set_yticks(list(range(0,105,20)))
     
-    ax[1].set_ylabel("Voltage (V)", fontsize = 12)
-    ax[1].set_xlabel("Time (sec)", fontsize = 12)
-    ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b-")
-    ax[1].set_title("Voltage vs Time")
-    ax[1].set_ylim([1.9,4])
-    ax[1].set_yticks(np.arange(2.0,4.1,0.4))
+#     ax[1].set_ylabel("Voltage (V)", fontsize = 12)
+#     ax[1].set_xlabel("Time (sec)", fontsize = 12)
+#     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b-")
+#     ax[1].set_title("Voltage vs Time")
+#     ax[1].set_ylim([1.9,4])
+#     ax[1].set_yticks(np.arange(2.0,4.1,0.4))
     
-    ax[2].set_ylabel("Current (A)", fontsize = 12 )
-    ax[2].set_xlabel("Time (sec)", fontsize = 12)
-    ax[2].plot(df_sim["time"].values, df_sim["current"].values, "g-")
-    ax[2].set_title("Current vs Time")
-    ax[2].set_yticks(list(range(int(min_I),
-                                int(max_I + 4),
-                                4)))
-    fig.tight_layout()
-    st.pyplot(fig)
+#     ax[2].set_ylabel("Current (A)", fontsize = 12 )
+#     ax[2].set_xlabel("Time (sec)", fontsize = 12)
+#     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "g-")
+#     ax[2].set_title("Current vs Time")
+#     ax[2].set_yticks(list(range(int(min_I),
+#                                 int(max_I + 4),
+#                                 4)))
+#     fig.tight_layout()
+#     st.pyplot(fig)
+    fig = make_subplots(rows=3,cols=1)
+    fig.add_trace(
+        px.line(df_sim, x= "time", y = "soc", title = "SOC (%)", x_title = "Time (sec)", mode="lines", color="red"),
+        row=1, col=1
+    )
+    fig.add_trace(
+        px.line(df_sim, x= "time", y = "voltage", title = "Voltage (V)", x_title = "Time (sec)", mode="lines", color="blue"),
+        row=2, col=1
+    )
+    fig.add_trace(
+        px.line(df_sim, x= "time", y = "current", title = "Current (A)", x_title = "Time (sec)", mode="lines", color="green"),
+        row=3, col=1
+    )
+    st.plotly_chart(fig)
