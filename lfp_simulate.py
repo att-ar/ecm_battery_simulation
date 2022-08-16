@@ -243,13 +243,17 @@ if start:
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
                      )
-    with sidebar:
-        @st.cache
+    @st.cache
         def convert_df(df):
             "convert pd.DataFrame to csv"
             return df.to_csv(index=False).encode("utf-8")
         csv = convert_df(df_sim)
+        
+    with sidebar:
         display_df = st.button(label = "Display simulated data")
+    if display_df: st.dataframe(data = df_sim)
+        
+    with sidebar:
         file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
         st.download_button(
             label = "Download data as CSV file",
@@ -257,7 +261,6 @@ if start:
             file_name = file_name,
             mime = "text/csv"
         )
-    if display_df: st.dataframe(data = df_sim)
             
     #plot
 #     fig, ax = plt.subplots(3, sharex=True, figsize = (12,9))
