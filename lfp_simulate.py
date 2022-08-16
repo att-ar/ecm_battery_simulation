@@ -257,9 +257,9 @@ if start:
         file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
         st.download_button(
             label = "Download data as CSV file",
-            data = df_sim,
+            data = csv,
             file_name = file_name,
-            mime = "text/csv"
+            mime = 'text/csv'
         )
             
     #plot
