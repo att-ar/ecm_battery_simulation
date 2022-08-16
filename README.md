@@ -1,6 +1,6 @@
 # Lithium-Ion Cell Simulation
 
-Link to [Streamlit App](https://att-ar-ecm-battery-simulation-lfp-simulate-gawm41.streamlitapp.com/):
+Link to [Streamlit App](https://att-ar-ecm-battery-simulation-lfp-simulate-gawm41.streamlitapp.com/), there is an option in the sidebar to download the generated pandas.DataFrame as a csv file
 
 There is also a Jupyter Notebook that uses the self-updating ProgressPlot from JupyterPlot:<br> *simulate_cell.ipynb*
 
