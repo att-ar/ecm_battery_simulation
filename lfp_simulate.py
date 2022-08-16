@@ -11,14 +11,13 @@ import numpy as np
 from numpy.polynomial import Polynomial as P
 import pandas as pd
 
-st.title("LFP Chemistry Lithium-Ion Cell Simulator")
+st.title("Lithium-Ion Cell Simulator Using the 2nd Order Equivalent Circuit Model")
 st.markdown(
-    "The purpose of this simulator is to generate SOC data for li-ion cells.")
+    "The purpose of this simulator is to generate SOC, Voltage, and Current data for lithium-ion cells.")
 st.markdown("Open Sidebar for Static ECM Parameterization.")
 
 sidebar = st.sidebar
 with sidebar:  # the sidebar of the GUI
-    "ECM Model Parameters:"
     r_int = st.number_input(label="Internal Resistance mΩ", value = 2.3) / 1000
     # RC-pairs for 2nd order ECM
     rc = st.columns(2)
@@ -26,36 +25,35 @@ with sidebar:  # the sidebar of the GUI
         r_1 = st.number_input(
             label="Resistance of R1 mΩ", value=2.7) / 1000
         c_1 = st.number_input(
-            label="Capacitance of C1", value=12000)
+            label="Capacitance of C1 F", value=12000)
     with rc[1]:
         r_2 = st.number_input(
             label="Resistance of R2 mΩ", value=2.1) / 1000
         c_2 = st.number_input(
-            label="Capacitance of C2", value=120000)
+            label="Capacitance of C2 F", value=120000)
 
     if not r_2:
         assert(r_1 != 0, "Change 1st RC pair first")
     if not c_2:
         assert(c_1 != 0, "Change 1st RC pair first")
 
-    "Testing Parameters"
     capacity = st.number_input(label="Battery Capacity in Ah", value=18.254)
 
     ocv = st.text_input(
-        label="10 OCV values from 100 to 10 SOC separated by commas:")
+        label="10 OCV values from 100 to 10 SOC split by commas:")
     "Example OCV: 3.557, 3.394, ..., 3.222, 3.174"
 
     cur = st.columns(2)
     with cur[0]:
         min_I = st.number_input(
-                    label = "Select most negative current wanted (A)",
+                    label = "Most (-) current (A)",
                     value = -1.0, max_value = 0.0)
     with cur[1]:
         max_I = st.number_input(
-                    label = "Select most positive current wanted (A)",
+                    label = "Most (+) current (A)",
                     value = 1.0, min_value = 0.0)
 
-    start = st.checkbox(label="Check to Run Simulation")
+    start = st.checkbox(label="Run Simulation")
 
 def generate_ocv_curve(ocv: list):
     '''
@@ -244,9 +242,9 @@ if start:
 
         image = s.get_imagedata("jpg")
 
-    front_page = st.columns(2)
-    with front_page[0]:
-        st.image(image)
+#     front_page = st.columns(2)
+#     with front_page[0]:
+    st.image(image)
 
     #sim
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
@@ -255,13 +253,13 @@ if start:
 
     csv = convert_df(df_sim)
 
-    with front_page[1]:
-        st.dataframe(data = df_sim)
+#     with front_page[1]:
+    st.dataframe(data = df_sim.T)
 
     with sidebar:
         file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
         st.download_button(
-            "Press to Download Simulated Data",
+            "Download Simulated Data",
             csv,
             file_name,
             "text/csv",
@@ -269,7 +267,16 @@ if start:
         )
         " "
         " "
-        " "
+    one = px.line(data_frame = df_sim, x= "time", y = "soc", title = "SOC v Time")
+    one["data"][0]["line"]["color"] = "red"
+    two = px.line(data_frame = df_sim, x= "time", y = "voltage", title = "Voltage v Time")
+    two["data"][0]["line"]["color"] = "pink"
+    three = px.line(data_frame = df_sim, x = "time", y = "current", title = "Current v Time")
+    three["data"][0]["line"]["color"] = "lightgreen"
+
+    st.plotly_chart(one)
+    st.plotly_chart(two)
+    st.plotly_chart(three)
 
     #plot
 #     fig, ax = plt.subplots(3, sharex=True, figsize = (12,9))
@@ -296,15 +303,3 @@ if start:
 #                                 4)))
 #     fig.tight_layout()
 #     st.pyplot(fig)
-
-    one = px.line(data_frame = df_sim, x= "time", y = "soc", title = "SOC v Time")
-    one["data"][0]["line"]["color"] = "red"
-    two = px.line(data_frame = df_sim, x= "time", y = "voltage", title = "Voltage v Time")
-    two["data"][0]["line"]["color"] = "pink"
-    three = px.line(data_frame = df_sim, x = "time", y = "current", title = "Current v Time")
-    three["data"][0]["line"]["color"] = "lightgreen"
-
-
-    st.plotly_chart(one)
-    st.plotly_chart(two)
-    st.plotly_chart(three)
