@@ -186,7 +186,7 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
                       r_2=kwargs["r_2"],
                       c_1=kwargs["c_1"],
                       c_2=kwargs["c_2"])
-    df_sim["time"] = [t * delta_t for t in range(len(df_sim))]
+    df_sim["time"] = [round(t * delta_t,1) for t in range(len(df_sim))]
 
     return df_sim
 #------------------------------
