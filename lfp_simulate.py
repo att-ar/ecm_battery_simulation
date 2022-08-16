@@ -44,7 +44,7 @@ with sidebar:  # the sidebar of the GUI
     ocv = st.text_input(
         label="10 OCV values from 100 to 10 SOC separated by commas:")
     "Example OCV: 3.557, 3.394, ..., 3.222, 3.174"
-    
+
     cur = st.columns(2)
     with cur[0]:
         min_I = st.number_input(
@@ -54,7 +54,7 @@ with sidebar:  # the sidebar of the GUI
         max_I = st.number_input(
                     label = "Select most positive current wanted (A)",
                     value = 1.0, min_value = 0.0)
-        
+
     start = st.checkbox(label="Check to Run Simulation")
 
 def generate_ocv_curve(ocv: list):
@@ -166,7 +166,7 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
         current[0] *= 2
     current_list= [0.0]
     for i in range(len(current)):
-        current_list.extend([current[i]] * int(6000 // (i+1) ** 0.4))
+        current_list.extend([current[i]] * int(5500 // (i+1) ** 0.4))
 
     df_sim= pd.DataFrame(columns={"current", "voltage", "soc"})
     df_sim["current"]= current_list
@@ -208,10 +208,10 @@ if start:
     assert(abs(min_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     assert(abs(max_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     current = np.array((max_I - min_I) * np.random.random_sample(24) + min_I).round(2)
-    
+
     "Progress Bar:"
     progress = st.progress(0)
-    
+
     #circuit
     with schemdraw.Drawing() as s:
         D = {}
@@ -244,8 +244,11 @@ if start:
         s += elm.Line().tox(V.start)
 
         image = s.get_imagedata("jpg")
-    st.image(image)
-    
+
+    front_page = st.columns(2)
+    with front_page[0]:
+        st.image(image)
+
     #sim
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
@@ -253,28 +256,22 @@ if start:
 
     csv = convert_df(df_sim)
 
-    st.download_button(
-        "Press to Download Simulated Data",
-        csv,
-        "browser_visits.csv",
-        "text/csv",
-        key='browser-data'
-    )
+    with front_page[1]:
+        st.dataframe(data = df_sim)
 
     with sidebar:
-        display_df = st.button(label = "Display simulated data")
-    if display_df: st.dataframe(data = df_sim)
-        
-    with sidebar:
         file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
-    st.download_button(
-        "Press to Download Simulated Data",
-        csv,
-        file_name,
-        "text/csv",
-        key='simulated-data'
-    )
-            
+        st.download_button(
+            "Press to Download Simulated Data",
+            csv,
+            file_name,
+            "text/csv",
+            key='simulated-data'
+        )
+        " "
+        " "
+        " "
+
     #plot
 #     fig, ax = plt.subplots(3, sharex=True, figsize = (12,9))
 #     ax[0].set_ylabel("SOC (%)", fontsize = 12 )
@@ -283,14 +280,14 @@ if start:
 #     ax[0].set_title("SOC vs Time")
 #     ax[0].set_ylim([0,105])
 #     ax[0].set_yticks(list(range(0,105,20)))
-    
+
 #     ax[1].set_ylabel("Voltage (V)", fontsize = 12)
 #     ax[1].set_xlabel("Time (sec)", fontsize = 12)
 #     ax[1].plot(df_sim["time"].values, df_sim["voltage"].values, "b-")
 #     ax[1].set_title("Voltage vs Time")
 #     ax[1].set_ylim([1.9,4])
 #     ax[1].set_yticks(np.arange(2.0,4.1,0.4))
-    
+
 #     ax[2].set_ylabel("Current (A)", fontsize = 12 )
 #     ax[2].set_xlabel("Time (sec)", fontsize = 12)
 #     ax[2].plot(df_sim["time"].values, df_sim["current"].values, "g-")
@@ -300,17 +297,15 @@ if start:
 #                                 4)))
 #     fig.tight_layout()
 #     st.pyplot(fig)
-    fig = make_subplots(rows=3,cols=1)
-    fig.add_trace(
-        px.line(df_sim, x= "time", y = "soc", title = "SOC (%)", x_title = "Time (sec)", mode="lines", color="red"),
-        row=1, col=1
-    )
-    fig.add_trace(
-        px.line(df_sim, x= "time", y = "voltage", title = "Voltage (V)", x_title = "Time (sec)", mode="lines", color="blue"),
-        row=2, col=1
-    )
-    fig.add_trace(
-        px.line(df_sim, x= "time", y = "current", title = "Current (A)", x_title = "Time (sec)", mode="lines", color="green"),
-        row=3, col=1
-    )
-    st.plotly_chart(fig)
+
+    one = px.line(data_frame = df_sim, x= "time", y = "soc", title = "SOC v Time")
+    one["data"][0]["line"]["color"] = "red"
+    two = px.line(data_frame = df_sim, x= "time", y = "voltage", title = "Voltage v Time")
+    two["data"][0]["line"]["color"] = "pink"
+    three = px.line(data_frame = df_sim, x = "time", y = "current", title = "Current v Time")
+    three["data"][0]["line"]["color"] = "lightgreen"
+
+
+    st.plotly_chart(one)
+    st.plotly_chart(two)
+    st.plotly_chart(three)

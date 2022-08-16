@@ -39,9 +39,9 @@ def lfp_cell(capacity: float, delta_t: float,
     if "data" in kwargs.keys():
         for col in ["ocv","r_int","r_1","r_2","c_1","c_2"]:
             assert col in kwargs["data"].columns
-            
+
         _, ocv = generate_ocv_curve(kwargs["data"]["ocv"].values)
-        
+
     else:
         r = np.array([kwargs["r_1"], kwargs["r_2"]])
         c = np.array([kwargs["c_1"], kwargs["c_2"]])
@@ -159,7 +159,7 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
         current[0] *= 2
     current_list= [0.0]
     for i in range(len(current)):
-        current_list.extend([current[i]] * int(6000 // (i+1) ** 0.4))
+        current_list.extend([current[i]] * int(5500 // (i+1) ** 0.4))
 
     df_sim= pd.DataFrame(columns={"current", "voltage", "soc"})
     df_sim["current"]= current_list
@@ -177,7 +177,7 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
     else:
         for i in ["r_int","r_1", "r_2","c_1", "c_2"]:
             assert i in kwargs.keys()
-            
+
         df_sim= lfp_cell(capacity,
                       delta_t,
                       df_sim["current"].values,
@@ -188,7 +188,7 @@ def simulate(capacity, current, delta_t=1.0, **kwargs):
                       r_2=kwargs["r_2"],
                       c_1=kwargs["c_1"],
                       c_2=kwargs["c_2"])
-     
+
     df_sim["time"] = [t * delta_t for t in range(len(df_sim))]
 
     return df_sim
