@@ -189,6 +189,12 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
     df_sim["time"] = [t * delta_t for t in range(len(df_sim))]
 
     return df_sim
+#------------------------------
+#converting dataframes to csv
+@st.cache
+def convert_df(df):
+    return df.to_csv().encode('utf-8')
+#------------------------------
 
 if start:
     if len(ocv) > 0:
@@ -243,24 +249,30 @@ if start:
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
                      )
-    @st.cache
-        def convert_df(df):
-            "convert pd.DataFrame to csv"
-            return df.to_csv(index=False).encode("utf-8")
-        csv = convert_df(df_sim)
-        
+
+    csv = convert_df(df_sim)
+
+    st.download_button(
+        "Press to Download Simulated Data",
+        csv,
+        "browser_visits.csv",
+        "text/csv",
+        key='browser-data'
+    )
+
     with sidebar:
         display_df = st.button(label = "Display simulated data")
     if display_df: st.dataframe(data = df_sim)
         
     with sidebar:
         file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
-        st.download_button(
-            label = "Download data as CSV file",
-            data = csv,
-            file_name = file_name,
-            mime = 'text/csv'
-        )
+    st.download_button(
+        "Press to Download Simulated Data",
+        csv,
+        file_name,
+        "text/csv",
+        key='simulated-data'
+    )
             
     #plot
 #     fig, ax = plt.subplots(3, sharex=True, figsize = (12,9))
