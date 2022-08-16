@@ -16,6 +16,8 @@ st.markdown(
     "The purpose of this simulator is to generate SOC, Voltage, and Current data for lithium-ion cells.")
 st.markdown("Open Sidebar for Static ECM Parameterization.")
 
+tab = st.tabs(["Simulation","DataFrame","Graphs"])
+
 sidebar = st.sidebar
 with sidebar:  # the sidebar of the GUI
     r_int = st.number_input(label="Internal Resistance mΩ", value = 2.3) / 1000
@@ -205,46 +207,45 @@ if start:
     assert(abs(min_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     assert(abs(max_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     current = np.array((max_I - min_I) * np.random.random_sample(24) + min_I).round(2)
+    
+    with tab[0]:
+        "Progress Bar:"
+        progress = st.progress(0)
 
-    "Progress Bar:"
-    progress = st.progress(0)
+        #circuit
+        with schemdraw.Drawing() as s:
+            D = {}
+            lst = [[r_1,c_1],[r_2,c_2]]
+            s.config(unit = 2)
+            s.add( V := elm.SourceV()).label("LFP Cell")
+            s.add( R_internal := R(label = str(round( 1000 * r_int,3)) + " mΩ"))
+            s += elm.Line().right()
+            s += elm.Dot()
+            for i in range(len(lst)):
+                s.push()
+                s += elm.Line().down()
+                s += R().label(label = f"R{i+1}: " + str(round(1000 * lst[i][0], 3)) + " mΩ",
+                loc = "bottom"
+                ).right()
+                s += elm.Line().up()
+                D[i] = elm.Dot()
+                s += D[i]
+                s.pop()
+                s.push()
+                s += elm.Line().up()
+                s.add( elm.Capacitor(label = f"C{i+1}: " + str(round(lst[i][1], 3)) + " F").right())
+                s += elm.Line().down()
+                s.pop()
+                s += elm.Line().at(D[i].start).right()
+                if i == 0:
+                    s += elm.Dot()
+            s += elm.Line().toy(V.start)
+            s += elm.SourceI(loc="bottom").left()
+            s += elm.Line().tox(V.start)
 
-    #circuit
-    with schemdraw.Drawing() as s:
-        D = {}
-        lst = [[r_1,c_1],[r_2,c_2]]
-        s.config(unit = 2)
-        s.add( V := elm.SourceV()).label("LFP Cell")
-        s.add( R_internal := R(label = str(round( 1000 * r_int,3)) + " mΩ"))
-        s += elm.Line().right()
-        s += elm.Dot()
-        for i in range(len(lst)):
-            s.push()
-            s += elm.Line().down()
-            s += R().label(label = f"R{i+1}: " + str(round(1000 * lst[i][0], 3)) + " mΩ",
-            loc = "bottom"
-            ).right()
-            s += elm.Line().up()
-            D[i] = elm.Dot()
-            s += D[i]
-            s.pop()
-            s.push()
-            s += elm.Line().up()
-            s.add( elm.Capacitor(label = f"C{i+1}: " + str(round(lst[i][1], 3)) + " F").right())
-            s += elm.Line().down()
-            s.pop()
-            s += elm.Line().at(D[i].start).right()
-            if i == 0:
-                s += elm.Dot()
-        s += elm.Line().toy(V.start)
-        s += elm.SourceI(loc="bottom").left()
-        s += elm.Line().tox(V.start)
+            image = s.get_imagedata("jpg")
 
-        image = s.get_imagedata("jpg")
-
-#     front_page = st.columns(2)
-#     with front_page[0]:
-    st.image(image)
+        st.image(image)
 
     #sim
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
@@ -252,9 +253,9 @@ if start:
                      )
 
     csv = convert_df(df_sim)
-
-#     with front_page[1]:
-    st.dataframe(data = df_sim.T)
+    
+    with tab[1]:
+        st.dataframe(data = df_sim)
 
     with sidebar:
         file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
@@ -273,10 +274,11 @@ if start:
     two["data"][0]["line"]["color"] = "pink"
     three = px.line(data_frame = df_sim, x = "time", y = "current", title = "Current v Time")
     three["data"][0]["line"]["color"] = "lightgreen"
-
-    st.plotly_chart(one)
-    st.plotly_chart(two)
-    st.plotly_chart(three)
+    
+    with tab[2]:
+        st.plotly_chart(one)
+        st.plotly_chart(two)
+        st.plotly_chart(three)
 
     #plot
 #     fig, ax = plt.subplots(3, sharex=True, figsize = (12,9))
