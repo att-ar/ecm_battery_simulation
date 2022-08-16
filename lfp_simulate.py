@@ -197,7 +197,6 @@ def convert_df(df):
 #------------------------------
 
 if start:
-    "Test"
     if len(ocv) > 0:
         ocv = ocv.split(",")
         assert len(ocv) == 10, "Need 10 OCV values"
