@@ -308,9 +308,10 @@ if start:
             return out
         
     with tab[2]:
-        lstm_cols = st.columns(2)
         "Progress Bar"
-        prediction_bar = st.progress(0)
+        with st.container():
+            prediction_bar = st.progress(0)
+        lstm_cols = st.columns(2)
         df_sim_norm = normalize(df_sim)
         x_set, y_set = rolling_split(df_sim_norm)
         set_dataloader = [set for set in zip(x_set,y_set)]
