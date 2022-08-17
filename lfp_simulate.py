@@ -315,7 +315,7 @@ if start:
         model.load_state_dict(torch.load("sim_model_state_dict.pth", map_location = device))
         model.eval()
 
-#         visualize, fig = validate(model, set_dataloader, prediction_bar)
-#         st.dataframe(visualize)
-#         st.plotly_chart(fig)
+        visualize, fig = validate(model, set_dataloader, prediction_bar)
+        st.dataframe(visualize)
+        st.plotly_chart(fig)
 
