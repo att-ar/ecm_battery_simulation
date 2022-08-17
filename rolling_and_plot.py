@@ -308,7 +308,7 @@ def rolling_split(df, window_size=32, batch_size=16):
 # Validation
 
 @cache
-def validate(model, dataloader, progress, dev=True):
+def validate(model, dataloader, progress):
     '''
     pytorch model, pytorch DataLoader -> pd.DataFrame, prints 2 tensors and a Plotly plot
 
@@ -322,7 +322,7 @@ def validate(model, dataloader, progress, dev=True):
     size = len(dataloader)
     with torch.no_grad(): #doesn't compute gradients
         for batch, (x, y) in enumerate(dataloader):
-            # progress_bar.progress((batch + 1) // size)
+            progress_bar.progress((batch + 1) // size)
             pred.append(model(torch.from_numpy(x)))
             labels.append(y)
 
