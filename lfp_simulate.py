@@ -308,6 +308,7 @@ if start:
             return out
         
     with tab[2]:
+        lstm_cols = st.columns(2)
         "Progress Bar"
         prediction_bar = st.progress(0)
         df_sim_norm = normalize(df_sim)
@@ -317,8 +318,9 @@ if start:
         model = LSTMNetwork().to(device)
         model.load_state_dict(torch.load("sim_model_state_dict.pth", map_location = device))
         model.eval()
-
-        visualize, fig = validate(model, set_dataloader, prediction_bar)
-        st.dataframe(visualize)
-        st.plotly_chart(fig)
+        with lstm_cols[0]:
+            visualize, fig = validate(model, set_dataloader, prediction_bar)
+            st.dataframe(visualize)
+        with lstm_cols[1]:
+            st.plotly_chart(fig)
 
