@@ -335,7 +335,7 @@ def validate(model, dataloader, progress):
     visualize.reset_index(drop=True)
 
     visualize["point"] = list(range(1, len(visualize) + 1))
-    perc_accuracy = np.mean(100.0 - abs(np_aggregate - np_labels) / (np_labels+1e-2) * 100)
+    perc_accuracy = np.mean(100.0 - abs(np_aggregate - np_labels) / (np_labels + 0.1) * 100)
     st.markdown(f"Percent Accuracy: {np.around(perc_accuracy, decimals = 2)} %")
 
     fig = data_plot(data=visualize,
