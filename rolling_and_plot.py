@@ -328,8 +328,8 @@ def validate(model, dataloader, progress):
     for i in pred:
         aggregate.extend(i)
 
-    st.markdown(f"Highest SOC Predicted: {round( max(aggregate).item(), 2 )} %")
-    st.markdown(f"Lowest SOC Predicted: {round( min(aggregate).item(), 2 )} %")
+    st.markdown(f"Highest SOC Predicted: {round( 100 * max(aggregate).item(), 2 )} %")
+    st.markdown(f"Lowest SOC Predicted: {round( 100 * min(aggregate).item(), 2 )} %")
 
     np_labels = np.array([unit for batch in labels for unit in batch], dtype="float32")
 
@@ -341,7 +341,7 @@ def validate(model, dataloader, progress):
     visualize.reset_index(drop=True)
 
     visualize["point"] = list(range(1, len(visualize) + 1))
-    st.markdown(f"Percent Accuracy: {round(np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100),2)}")
+    st.markdown(f"Percent Accuracy: {np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100).round(2) } %")
 
     fig = data_plot(data=visualize,
                     x=[["point", "point"]],
