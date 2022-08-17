@@ -172,7 +172,7 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
         current[0] *= 2
     current_list= [0.0]
     for i in range(len(current)):
-        current_list.extend([current[i]] * int(5500 // (i+1) ** 0.4))
+        current_list.extend([current[i]] * int(1500 // (i+1) ** 0.4))
 
     df_sim= pd.DataFrame(columns={"current", "voltage", "soc"})
     df_sim["current"]= current_list
@@ -314,6 +314,7 @@ if start:
 
     #-----------------------------------
     # LSTM Model
+    device = torch.device("cpu")
     class BatterySet(Dataset):
         def __init__(self, x: np.ndarray, y: np.ndarray):
 
