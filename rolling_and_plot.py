@@ -326,14 +326,14 @@ def validate(model, dataloader, progress):
 
     aggregate = []
     for i in pred:
-        aggregate.extend(round(i,2))
+        aggregate.extend(i)
 
-    st.markdown(f"Highest SOC Predicted: {round(max(aggregate).item())} %")
-    st.markdown(f"Lowest SOC Predicted: {round(min(aggregate).item())} %")
+    st.markdown(f"Highest SOC Predicted: {round( max(aggregate).item(), 2 )} %")
+    st.markdown(f"Lowest SOC Predicted: {round( min(aggregate).item(), 2 )} %")
 
     np_labels = np.array([unit for batch in labels for unit in batch], dtype="float32")
 
-    np_aggregate = np.array([p.detach().cpu().numpy()[0] for p in aggregate], dtype="float32")
+    np_aggregate = np.array([round(p.detach().cpu().numpy()[0], 2) for p in aggregate], dtype="float32")
 
     visualize = pd.DataFrame(data={"pred": np_aggregate.squeeze(),
                                    "labels": np_labels.squeeze()})
