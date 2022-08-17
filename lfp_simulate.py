@@ -249,7 +249,7 @@ if start:
             s += elm.SourceI(loc="bottom").left()
             s += elm.Line().tox(V.start)
 
-            image = s.get_imagedata("png")
+            image = s.get_imagedata()
 
         st.image(image)
 
