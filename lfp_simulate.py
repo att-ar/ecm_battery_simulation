@@ -172,11 +172,11 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
     current[3], current[6], current[15]= 0.00, 0.00, 0.00
     if current[0] >= 0.0:
         current[0] *= -1
-    if current[0] >= -2.0:
+    if current[0] >= -5.0:
         current[0] *= 2
-    current_list= [0.0]
+    current_list= [0.0,-6.0]
     for i in range(len(current)):
-        current_list.extend([current[i]] * int(1500 // (i+1) ** 0.4))
+        current_list.extend([current[i]] * int(5500 // (i+1) ** 0.4))
 
     df_sim= pd.DataFrame(columns={"current", "voltage", "soc"})
     df_sim["current"]= current_list
