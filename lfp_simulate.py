@@ -170,6 +170,10 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
     assert(len(current) > 15)
 
     current[3], current[6], current[15]= 0.00, 0.00, 0.00
+    if current[0] < 0.0:
+        current[0] *= -1.0
+    if current[0] < 0.0 and current[0] > -2.0:
+        current[0] *= 5.0
     current_list= [0.0] + [-capacity] * 3600
     #ensures a sweep from 100 SOC to 0 SOC, which is industry norm,
     #and required for my model to function well
