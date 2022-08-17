@@ -9,8 +9,7 @@ from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 from sklearn.model_selection import train_test_split
 
 import torch
-
-from streamlit import progress, cache
+import streamlit as st
 
 
 def helper(value, j):
@@ -321,7 +320,7 @@ def validate(model, dataloader, progress):
     size = len(dataloader)
     with torch.no_grad(): #doesn't compute gradients
         for batch, (x, y) in enumerate(dataloader):
-            progress_bar.progress((batch + 1) // size)
+            progress.progress((batch + 1) // size)
             pred.append(model(torch.from_numpy(x)))
             labels.append(y)
 
