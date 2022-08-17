@@ -321,12 +321,12 @@ def validate(model, dataloader, progress):
     with torch.no_grad(): #doesn't compute gradients
         for batch, (x, y) in enumerate(dataloader):
             progress.progress((batch + 1) / size)
-            pred.append(round(model(torch.from_numpy(x)),2))
+            pred.append(model(torch.from_numpy(x)))
             labels.append(round(y,2))
 
     aggregate = []
     for i in pred:
-        aggregate.extend(i)
+        aggregate.extend(round(i,2))
 
     st.markdown(f"Highest SOC Predicted: {round(max(aggregate).item())} %")
     st.markdown(f"Lowest SOC Predicted: {round(min(aggregate).item())} %")
