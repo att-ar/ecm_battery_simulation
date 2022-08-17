@@ -320,7 +320,7 @@ def validate(model, dataloader, progress):
     size = len(dataloader)
     with torch.no_grad(): #doesn't compute gradients
         for batch, (x, y) in enumerate(dataloader):
-            progress.progress((batch + 1) // size)
+            progress.progress((batch + 1) / size)
             pred.append(model(torch.from_numpy(x)))
             labels.append(y)
 
@@ -328,7 +328,7 @@ def validate(model, dataloader, progress):
     for i in pred:
         aggregate.extend(i)
 
-    st.markdown(f"Max Predict: {max(aggregate)}\tMin Predict: {min(aggregate)}")
+    st.markdown(f"Max Predict: {max(aggregate).item()}\tMin Predict: {min(aggregate).item()}")
 
     np_labels = np.array([unit for batch in labels for unit in batch], dtype="float32")
 
