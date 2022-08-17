@@ -18,6 +18,9 @@ from dataclasses import dataclass
 
 from rolling_and_plot import normalize, rolling_split, validate
 
+device = torch.device("cpu")
+print(device)
+
 st.title("Lithium-Ion Cell Simulator Using the 2nd Order Equivalent Circuit Model")
 st.markdown(
     "The purpose of this simulator is to generate SOC, Voltage, and Current data for lithium-ion cells.")
@@ -280,16 +283,16 @@ if start:
 
     #-----------------------------------
     # LSTM Model
-    with tab[2]:
-        prediction_bar = st.progress(0)
-        df_sim_norm = normalize(df_sim)
-        x_set, y_set = rolling_split(df_sim_norm)
-        set_dataloader = [set for set in zip(x_set,y_set)]
+#     with tab[2]:
+#         prediction_bar = st.progress(0)
+#         df_sim_norm = normalize(df_sim)
+#         x_set, y_set = rolling_split(df_sim_norm)
+#         set_dataloader = [set for set in zip(x_set,y_set)]
 
-        model = torch.jit.load("model_scripted.pth")
-        model.eval()
+#         model = torch.jit.load("model_scripted.pth")
+#         model.eval()
 
-        visualize, fig = validate(model, set_dataloader, prediction_bar)
-        st.dataframe(visualize)
-        st.plotly_chart(fig)
+#         visualize, fig = validate(model, set_dataloader, prediction_bar)
+#         st.dataframe(visualize)
+#         st.plotly_chart(fig)
 
