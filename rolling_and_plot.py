@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 
 import torch
 
-from streamlit import progress
+from streamlit import progress, cache
 
 
 def helper(value, j):
@@ -346,7 +346,7 @@ def rolling_split(df, window_size, test_size=0.1, train=True):
 # ----------------------------------------------------------------
 # Validation
 
-@st.cache
+@cache
 def validate(model, dataloader, progress, dev=True):
     '''
     pytorch model, pytorch DataLoader -> pd.DataFrame, prints 2 tensors and a Plotly plot
