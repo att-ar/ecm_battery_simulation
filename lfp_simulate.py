@@ -251,7 +251,7 @@ if start:
 
             image = s.get_imagedata()
 
-        st.image(image)
+        st.image(<svg xmlns=image</svg>)
 
     #sim
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
