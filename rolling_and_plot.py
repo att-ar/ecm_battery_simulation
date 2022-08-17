@@ -10,6 +10,8 @@ from sklearn.model_selection import train_test_split
 
 import torch
 
+from streamlit import progress
+
 
 def helper(value, j):
     '''
@@ -345,7 +347,7 @@ def rolling_split(df, window_size, test_size=0.1, train=True):
 # Validation
 
 
-def validate(model, dataloader, dev=True):
+def validate(model, dataloader, progress, dev=True):
     '''
     pytorch model, pytorch DataLoader -> pd.DataFrame, prints 2 tensors and a Plotly plot
 
@@ -355,8 +357,10 @@ def validate(model, dataloader, dev=True):
     '''
     pred = []
     model.eval() # deactivates dropout and batchnorm
+    size = len(dataloader)
     with torch.no_grad(): #doesn't compute gradients
-        for x, y in dataloader:
+        for batch, (x, y) in enumerate(dataloader):
+            progress_bar.progress((batch + 1) // size)
             pred.append(model(x))
 
     aggregate = []
