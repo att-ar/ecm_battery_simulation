@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from rolling_and_plot import normalize, rolling_split, validate
 
 device = torch.device("cpu")
-print(device)
+st.write(device)
 
 st.title("Lithium-Ion Cell Simulator Using the 2nd Order Equivalent Circuit Model")
 st.markdown(
