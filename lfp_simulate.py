@@ -52,8 +52,8 @@ with sidebar:  # the sidebar of the GUI
     capacity = st.number_input(label="Battery Capacity in Ah", value=18.254)
 
     ocv = st.text_input(
-        label="10 OCV values from 100 to 10 SOC split by commas:")
-    "Example OCV: 3.557, 3.394, ..., 3.222, 3.174"
+        label="11 OCV values from 100 to 0 SOC split by commas:")
+    "Example OCV: 3.557, 3.394, ..., 3.222, 3.174, 2.750"
 
     cur = st.columns(2)
     with cur[0]:
@@ -74,11 +74,11 @@ def generate_ocv_curve(ocv: list):
     and outputs ocv values at all unit soc values from 100% to 10%
     '''
     # assert isinstance(ocv, list)
-    soc = list(range(100,0,-10))
+    soc = list(range(100,-1,-10))
     assert len(ocv) == len(soc)
-    assert len(ocv) == 10
-    curve = P.fit(soc, ocv, 8, domain = [5,100])
-    return curve.linspace(96, domain = (100, 5))
+    assert len(ocv) == 11
+    curve = P.fit(soc, ocv, 8, domain = [0,100])
+    return curve.linspace(101, domain = (100, 0))
 
 # Second Order RC-Model
 def model_2rc(current, delta_t, u_rc, ocv, r_int, r, c):
@@ -107,7 +107,7 @@ def lfp_cell(capacity: float, delta_t: float,
     for i in range(len(current)):
         progress.progress((i + 1) / len(current))
         if (soc[i] >= 99.9 and current[i] > 0.0) or \
-           (soc[i] <= 5.3 and current[i] < 0.0):
+           (soc[i] <= 0.3 and current[i] < 0.0):
 
             slice1 = min(len(current), i + 2000)
             slice2 = min(len(current), i + 12000)
@@ -209,7 +209,7 @@ def convert_df(df):
 if start:
     if len(ocv) > 0:
         ocv = ocv.split(",")
-        assert len(ocv) == 10, "Need 10 OCV values"
+        assert len(ocv) == 11, "Need 11 OCV values"
         for i in ocv:
             i = i.strip()
             assert i.replace(".","").isnumeric(), "Need numerical values"
