@@ -277,7 +277,7 @@ if start:
     with tab[2]:
         prediction_bar = st.progress(0)
         df_sim_norm = normalize(df_sim)
-        x_set, y_set = rolling_split(file)
+        x_set, y_set = rolling_split(df_sim_norm)
         set_dataloader = [set for set in zip(x_set,y_set)]
 
         model = torch.jit.load("model_scripted.pth")
