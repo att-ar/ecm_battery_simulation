@@ -261,13 +261,7 @@ def normalize(data: pd.DataFrame):
     data["voltage"] = MinMaxScaler((0, 1)).fit_transform(
         data["voltage"].values.reshape(-1, 1))
     data["soc"] /= 100.
-
-    print(f'''Scaled stats:
-
-variance:\n{data.var(axis = 0)},
-
-mean:\n{data.mean(axis=0)}''')
-
+    
     return data
 
 
@@ -341,7 +335,8 @@ def validate(model, dataloader, progress):
     visualize.reset_index(drop=True)
 
     visualize["point"] = list(range(1, len(visualize) + 1))
-    st.markdown(f"Percent Accuracy: {np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100).round(2) } %")
+    perc_accuracy = np.mean(100.0 - abs((np_aggregate - np_labels)) / (np_labels+1e-2) * 100)
+    st.markdown(f"Percent Accuracy: {np.round(perc_accuracy, 2} %")
 
     fig = data_plot(data=visualize,
                     x=[["point", "point"]],
