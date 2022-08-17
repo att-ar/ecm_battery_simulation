@@ -235,7 +235,7 @@ if start:
         
 
     with sidebar:
-        file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
+        file_name = st.text_input(label = "File name for csv", value = "simulated_data.csv")
         st.download_button(
             "Download Simulated Data",
             csv,
