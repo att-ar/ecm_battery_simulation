@@ -258,7 +258,7 @@ def normalize(data: pd.DataFrame):
     '''
     data["current"] = MaxAbsScaler().fit_transform(
         data["current"].values.reshape(-1, 1))
-    data["voltage"] = MinMaxScaler((0, 1)).fit_transform(
+    data["voltage"] = MinMaxScaler((0.075, 1)).fit_transform(
         data["voltage"].values.reshape(-1, 1))
     data["soc"] /= 100.
     
