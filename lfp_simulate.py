@@ -8,6 +8,7 @@ import pandas as pd
 
 import torch
 from torch import nn
+from torch.nn.modules.activation import Sigmoid
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import ToTensor, Lambda
 
@@ -282,15 +283,37 @@ if start:
 
     #-----------------------------------
     # LSTM Model
+    class LSTMNetwork(nn.Module):
+        def __init__(self):
+            super(LSTMNetwork, self).__init__()
+            self.lstm = nn.LSTM(3, 256, 1, batch_first = True)
+            self.linear_stack = nn.Sequential(
+                nn.Linear(256, 256),
+                nn.BatchNorm1d(256, momentum = 0.92),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(256, 256),
+                nn.BatchNorm1d(256, momentum = 0.92),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(256, 1),
+                Sigmoid()
+            )
+        def forward(self, x):
+            #lstm
+            x_out, (h_n_lstm, c_n)  = self.lstm(x)
+            out = self.linear_stack(h_n_lstm.squeeze())
+            return out
+        
     with tab[2]:
         prediction_bar = st.progress(0)
         df_sim_norm = normalize(df_sim)
         x_set, y_set = rolling_split(df_sim_norm)
         set_dataloader = [set for set in zip(x_set,y_set)]
 
-#         model = torch.jit.load("model_scripted.pth")
-#         model.to(device)
-#         model.eval()
+        model = LSTMNetwork().to(device)
+        model.load_state_dict(torch.load("sim_model_state_dict.pth", map_location = device))
+        model.eval()
 
 #         visualize, fig = validate(model, set_dataloader, prediction_bar)
 #         st.dataframe(visualize)
