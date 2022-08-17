@@ -392,5 +392,4 @@ def validate(model, dataloader, dev=True):
                     mode=[["lines", "lines"]],
                     color=[["red", "yellow"]]
                     )
-    fig.show()
-    return visualize
+    return visualize, fig
