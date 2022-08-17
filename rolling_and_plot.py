@@ -272,16 +272,14 @@ mean:\n{data.mean(axis=0)}''')
     return data
 
 
-def rolling_split(df, window_size):
+def rolling_split(df, window_size=32, batch_size=16):
     '''
     Precondition: "delta t" is not in the columns
     implements rolling window sectioning
     Four input features: delta_t, I, V, SOC all at time t-1
     The prediction of SOC at time t uses no other information
-
     Returns a shuffled and windowed dataset using
     sklearn.model_selection.train_test_split
-
     Parameters:
     `window_size` int
         the number of consecutive data points needed to form a data window * num of batches
@@ -290,25 +288,21 @@ def rolling_split(df, window_size):
         Should never exceed 0.2
     '''
     assert "delta t" not in df.columns
-    assert isinstance(test_size, float)
-    assert test_size > 0 and test_size <= 0.2
 
     df_x = np.array([window.values
                     for window
                     # staggered left by one
                     in df[["current", "voltage", "soc"]].iloc[:-1]
                     .rolling(window=window_size,
-                             min_periods=window_size - 2,
-                             method="table"
-                             )][window_size:])
-    df_x = np.split(df_x, int(len(df_x) // 16) ) 
+                            method="table"
+                            )][window_size:])
+    drop_remainder = len(df_x) % batch_size
+    df_x = np.array(np.split(df_x[:-drop_remainder], (len(df_x) - drop_remainder) // batch_size), dtype = "float32")
+
+    df_y = df["soc"].iloc[window_size + 1:]
+    df_y = np.split(df_y[:-drop_remainder], (len(df_y) - drop_remainder) // batch_size)
     
-    df_y = df["soc"].iloc[window_size + 1:].values
-    df_y.reshape(len(df_y),1)
-    df_y = np.split(df_y, int(df_y.shape[0] // 16) )
-    
-    return (np.array(df_x, dtype="float32"),
-            np.array(df_y, dtype="float32")[:, np.newaxis])
+    return df_x, df_y
 
 # ----------------------------------------------------------------
 # Validation
@@ -323,35 +317,32 @@ def validate(model, dataloader, progress, dev=True):
     This function outputs a pandas.DataFrame of the predictions with their corresponding labels.
     '''
     pred = []
+    labels = []
     model.eval() # deactivates dropout and batchnorm
     size = len(dataloader)
     with torch.no_grad(): #doesn't compute gradients
         for batch, (x, y) in enumerate(dataloader):
-            progress_bar.progress((batch + 1) // size)
-            pred.append(model(x))
+            # progress_bar.progress((batch + 1) // size)
+            pred.append(model(torch.from_numpy(x)))
+            labels.append(y)
 
     aggregate = []
-    for i in pred:  # this way is faster than list comprehension below
+    for i in pred:
         aggregate.extend(i)
-    print(max(aggregate), min(aggregate))
 
-    # aggregate = [unit for batch in pred for unit in batch]
-    # print(max(aggregate), min(aggregate))
+    st.markdown(f"Max Predict: {max(aggregate)}\tMin Predict: {min(aggregate)}")
 
-    np_aggregate = np.array([p.detach().cpu().numpy() for p in aggregate])
-    np_labels = torch.clone(dataloader.dataset.labels).detach().cpu().numpy()[
-        :len(np_aggregate)]
+    np_labels = np.array([unit for batch in labels for unit in batch], dtype="float32")
+
+    np_aggregate = np.array([p.detach().cpu().numpy()[0] for p in aggregate], dtype="float32")
 
     visualize = pd.DataFrame(data={"pred": np_aggregate.squeeze(),
                                    "labels": np_labels.squeeze()})
-    if dev:  # if it is the dev set, the values need to be sorted by value
-        visualize.sort_values("labels", inplace=True)
-    # if it is the entire dataset, it is already sorted chronologically which is more important
 
     visualize.reset_index(drop=True)
 
     visualize["point"] = list(range(1, len(visualize) + 1))
-    print("Percent Accuracy:", np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100))
+    st.markdown(f"Percent Accuracy: {np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100)})
 
     fig = data_plot(data=visualize,
                     x=[["point", "point"]],
