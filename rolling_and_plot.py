@@ -321,14 +321,15 @@ def validate(model, dataloader, progress):
     with torch.no_grad(): #doesn't compute gradients
         for batch, (x, y) in enumerate(dataloader):
             progress.progress((batch + 1) / size)
-            pred.append(model(torch.from_numpy(x)))
-            labels.append(y)
+            pred.append(round(model(torch.from_numpy(x)),2))
+            labels.append(round(y,2))
 
     aggregate = []
     for i in pred:
         aggregate.extend(i)
 
-    st.markdown(f"Max Predict: {max(aggregate).item()}\tMin Predict: {min(aggregate).item()}")
+    st.markdown(f"Highest SOC Predicted: {round(max(aggregate).item())} %")
+    st.markdown(f"Lowest SOC Predicted: {round(min(aggregate).item())} %")
 
     np_labels = np.array([unit for batch in labels for unit in batch], dtype="float32")
 
@@ -340,7 +341,7 @@ def validate(model, dataloader, progress):
     visualize.reset_index(drop=True)
 
     visualize["point"] = list(range(1, len(visualize) + 1))
-    st.markdown(f"Percent Accuracy: {np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100)}")
+    st.markdown(f"Percent Accuracy: {round(np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100),2)}")
 
     fig = data_plot(data=visualize,
                     x=[["point", "point"]],
