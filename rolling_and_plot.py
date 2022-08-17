@@ -346,7 +346,7 @@ def rolling_split(df, window_size, test_size=0.1, train=True):
 # ----------------------------------------------------------------
 # Validation
 
-
+@st.cache
 def validate(model, dataloader, progress, dev=True):
     '''
     pytorch model, pytorch DataLoader -> pd.DataFrame, prints 2 tensors and a Plotly plot
