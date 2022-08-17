@@ -1,9 +1,4 @@
-import schemdraw
-import schemdraw.elements as elm
-from schemdraw.elements import Resistor as R
-
 import streamlit as st
-# import matplotlib.pyplot as plt
 from plotly.subplots import make_subplots
 import plotly.express as px
 
@@ -22,7 +17,7 @@ st.markdown(
     "The purpose of this simulator is to generate SOC, Voltage, and Current data for lithium-ion cells.")
 st.markdown("Open Sidebar for Static ECM Parameterization.")
 
-tab = st.tabs(["Simulation","DataFrame","Graphs","LSTM Predictions"])
+tab = st.tabs(["Simulation","Graphs","LSTM Predictions"])
 
 sidebar = st.sidebar
 with sidebar:  # the sidebar of the GUI
@@ -218,41 +213,6 @@ if start:
         "Progress Bar:"
         progress = st.progress(0)
 
-        #circuit
-        with schemdraw.Drawing() as s:
-            D = {}
-            lst = [[r_1,c_1],[r_2,c_2]]
-            s.config(unit = 2)
-            s.add( V := elm.SourceV()).label("LFP Cell")
-            s.add( R_internal := R(label = str(round( 1000 * r_int,3)) + " mΩ"))
-            s += elm.Line().right()
-            s += elm.Dot()
-            for i in range(len(lst)):
-                s.push()
-                s += elm.Line().down()
-                s += R().label(label = f"R{i+1}: " + str(round(1000 * lst[i][0], 3)) + " mΩ",
-                loc = "bottom"
-                ).right()
-                s += elm.Line().up()
-                D[i] = elm.Dot()
-                s += D[i]
-                s.pop()
-                s.push()
-                s += elm.Line().up()
-                s.add( elm.Capacitor(label = f"C{i+1}: " + str(round(lst[i][1], 3)) + " F").right())
-                s += elm.Line().down()
-                s.pop()
-                s += elm.Line().at(D[i].start).right()
-                if i == 0:
-                    s += elm.Dot()
-            s += elm.Line().toy(V.start)
-            s += elm.SourceI(loc="bottom").left()
-            s += elm.Line().tox(V.start)
-
-            image = s.get_imagedata("jpg")
-
-        st.image(image, output_format = "PNG")
-
     #sim
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
                       r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
@@ -260,7 +220,7 @@ if start:
 
     csv = convert_df(df_sim)
     
-    with tab[1]:
+    with tab[0]:
         st.dataframe(data = df_sim)
 
     with sidebar:
@@ -281,7 +241,7 @@ if start:
     three = px.line(data_frame = df_sim, x = "time", y = "current", title = "Current v Time")
     three["data"][0]["line"]["color"] = "lightgreen"
     
-    with tab[2]:
+    with tab[1]:
         st.plotly_chart(one)
         st.plotly_chart(two)
         st.plotly_chart(three)
@@ -314,7 +274,7 @@ if start:
 
     #-----------------------------------
     # LSTM Model
-    with tab[3]:
+    with tab[2]:
         prediction_bar = st.progress(0)
         df_sim_norm = normalize(df_sim)
         x_set, y_set = rolling_split(file)
