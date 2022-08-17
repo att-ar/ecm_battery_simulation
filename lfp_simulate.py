@@ -314,30 +314,31 @@ if start:
 
     #-----------------------------------
     # LSTM Model
-    device = torch.device("cpu")
-    class BatterySet(Dataset):
-        def __init__(self, x: np.ndarray, y: np.ndarray):
+#     device = torch.device("cpu")
+#     class BatterySet(Dataset):
+#         def __init__(self, x: np.ndarray, y: np.ndarray):
 
-            self.logits = torch.from_numpy(x.squeeze()).to(device)
-            self.labels = torch.from_numpy(y).to(device)
+#             self.logits = torch.from_numpy(x.squeeze()).to(device)
+#             self.labels = torch.from_numpy(y).to(device)
 
-        def __len__(self):
-            return len(self.labels)
+#         def __len__(self):
+#             return len(self.labels)
 
-        def __getitem__(self, idx):
-            return (self.logits[idx], self.labels[idx])
+#         def __getitem__(self, idx):
+#             return (self.logits[idx], self.labels[idx])
 
-    with tab[3]:
-        prediction_bar = st.progress(0)
-        df_sim_norm = normalize(df_sim)
-        x_set, y_set = rolling_split(df_sim_norm, 32, train = False)
-        set_dataloader = BatterySet(x_set, y_set)
-        set_dataloader = DataLoader(set_dataloader, batch_size=16, shuffle=False, drop_last = True)
+#     with tab[3]:
+#         prediction_bar = st.progress(0)
+#         df_sim_norm = normalize(df_sim)
+#         x_set, y_set = rolling_split(df_sim_norm, 32, train = False)
+        
+# #         set_dataloader = BatterySet(x_set, y_set)
+# #         set_dataloader = DataLoader(set_dataloader, batch_size=16, shuffle=False, drop_last = True)
 
-        model = torch.jit.load("model_scripted.pth")
-        model.eval()
+#         model = torch.jit.load("model_scripted.pth")
+#         model.eval()
 
-        visualize, fig = validate(model, set_dataloader, prediction_bar, dev = False)
-        st.dataframe(visualize)
-        st.plotly_chart(fig)
+#         visualize, fig = validate(model, set_dataloader, prediction_bar, dev = False)
+#         st.dataframe(visualize)
+#         st.plotly_chart(fig)
 
