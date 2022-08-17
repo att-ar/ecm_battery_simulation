@@ -301,7 +301,7 @@ def rolling_split(df, window_size=32, batch_size=16):
 
     df_y = df["soc"].iloc[window_size + 1:]
     df_y = np.split(df_y[:-drop_remainder], (len(df_y) - drop_remainder) // batch_size)
-    
+
     return df_x, df_y
 
 # ----------------------------------------------------------------
@@ -342,7 +342,7 @@ def validate(model, dataloader, progress):
     visualize.reset_index(drop=True)
 
     visualize["point"] = list(range(1, len(visualize) + 1))
-    st.markdown(f"Percent Accuracy: {np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100)})
+    st.markdown(f"Percent Accuracy: {np.mean(100.0 - abs((np_aggregate - np_labels))/np_labels * 100)}")
 
     fig = data_plot(data=visualize,
                     x=[["point", "point"]],
