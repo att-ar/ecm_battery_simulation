@@ -271,38 +271,8 @@ mean:\n{data.mean(axis=0)}''')
 
     return data
 
-# -------------------------------------------------------
 
-
-def rolling_split_trial(df, window_size):
-    '''
-    implements rolling window sectioning
-    There are four input features: delta_t, V, I at time t, and SOC at time t-1
-    Prediction at time t uses the features given
-    '''
-    if "delta t" in df.columns:
-        col = ["delta t", "current", "voltage"]
-    else:
-        col = ["current", "voltage"]
-    df_x = (df[col].iloc[1:].reset_index(drop=True)  # staggered right by one
-            .join(
-        df["soc"].iloc[:-1].reset_index(drop=True),  # staggered left by one
-        how="outer"
-    ))
-    df_x = [window.values
-            for window
-            in df_x.rolling(window=window_size,
-                            min_periods=window_size - 2,
-                            method="table"
-                            )][window_size:]
-
-    # staggered right by one
-    df_y = df["soc"].iloc[window_size + 1:].values[:, np.newaxis]
-
-    return np.array(df_x, dtype="float32"), np.array(df_y, dtype="float32")
-
-
-def rolling_split(df, window_size, test_size=0.1, train=True):
+def rolling_split(df, window_size):
     '''
     Precondition: "delta t" is not in the columns
     implements rolling window sectioning
@@ -314,7 +284,7 @@ def rolling_split(df, window_size, test_size=0.1, train=True):
 
     Parameters:
     `window_size` int
-        the number of consecutive data points needed to form a data window
+        the number of consecutive data points needed to form a data window * num of batches
     `test_size` float in (0.0, 0.2]
         the ratio of data points allocated to the dev/test set
         Should never exceed 0.2
@@ -323,25 +293,22 @@ def rolling_split(df, window_size, test_size=0.1, train=True):
     assert isinstance(test_size, float)
     assert test_size > 0 and test_size <= 0.2
 
-    df_x = [window.values
-            for window
-            # staggered left by one
-            in df[["current", "voltage", "soc"]].iloc[:-1]
-            .rolling(window=window_size,
-                     min_periods=window_size - 2,
-                     method="table"
-                     )][window_size:]
-
+    df_x = np.array([window.values
+                    for window
+                    # staggered left by one
+                    in df[["current", "voltage", "soc"]].iloc[:-1]
+                    .rolling(window=window_size,
+                             min_periods=window_size - 2,
+                             method="table"
+                             )][window_size:])
+    df_x = np.split(df_x, int(len(df_x) // 16) ) 
+    
     df_y = df["soc"].iloc[window_size + 1:].values
-
-    if train:
-        return train_test_split(np.array(df_x, dtype="float32"),
-                                np.array(df_y, dtype="float32")[:, np.newaxis],
-                                test_size=test_size,
-                                shuffle=True)
-    else:
-        return (np.array(df_x, dtype="float32"),
-                np.array(df_y, dtype="float32")[:, np.newaxis])
+    df_y.reshape(len(df_y),1)
+    df_y = np.split(df_y, int(df_y.shape[0] // 16) )
+    
+    return (np.array(df_x, dtype="float32"),
+            np.array(df_y, dtype="float32")[:, np.newaxis])
 
 # ----------------------------------------------------------------
 # Validation
