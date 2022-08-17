@@ -321,6 +321,7 @@ def validate(model, dataloader, progress):
     aggregate = []
     for i in pred:
         aggregate.extend(i)
+        st.table(aggregate)
 
     st.markdown(f"Highest SOC Predicted: {round( 100 * max(aggregate).item(), 2 )} %")
     st.markdown(f"Lowest SOC Predicted: {round( 100 * min(aggregate).item(), 2 )} %")
