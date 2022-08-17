@@ -230,7 +230,9 @@ if start:
     csv = convert_df(df_sim)
     
     with tab[0]:
+        "Check the other Tabs for more!"
         st.dataframe(data = df_sim)
+        
 
     with sidebar:
         file_name = st.text_input(label = "file name for csv", value = "simulated_data.csv")
@@ -306,6 +308,7 @@ if start:
             return out
         
     with tab[2]:
+        "Progress Bar"
         prediction_bar = st.progress(0)
         df_sim_norm = normalize(df_sim)
         x_set, y_set = rolling_split(df_sim_norm)
