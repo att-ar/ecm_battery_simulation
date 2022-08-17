@@ -170,15 +170,11 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
     assert(len(current) > 15)
 
     current[3], current[6], current[15]= 0.00, 0.00, 0.00
-    if current[0] >= 0.0:
-        current[0] *= -1
-    if current[0] >= -5.0:
-        current[0] *= 2
-    current_list= [0.0,-capacity]
+    current_list= [0.0] + [-capacity] * 3600
     #ensures a sweep from 100 SOC to 0 SOC, which is industry norm,
     #and required for my model to function well
-    for i in range(1, len(current)):
-        current_list.extend([current[i]] * int(3600 // (i) ** 0.4))
+    for i in range(len(current)):
+        current_list.extend([current[i]] * int(3000 // (i+1) ** 0.4))
 
     df_sim= pd.DataFrame(columns={"current", "voltage", "soc"})
     df_sim["current"]= current_list
