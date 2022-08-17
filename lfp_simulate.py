@@ -249,9 +249,9 @@ if start:
             s += elm.SourceI(loc="bottom").left()
             s += elm.Line().tox(V.start)
 
-            image = s.get_imagedata("svg")
+            image = s.get_imagedata("jpg")
 
-        st.image("<svg xmlns=\"image\"></svg>", output_format = "PNG")
+        st.image(image, output_format = "PNG")
 
     #sim
     df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
