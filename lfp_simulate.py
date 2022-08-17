@@ -288,11 +288,11 @@ if start:
         x_set, y_set = rolling_split(df_sim_norm)
         set_dataloader = [set for set in zip(x_set,y_set)]
 
-        model = torch.jit.load("model_scripted.pth")
-        model.to(device)
-        model.eval()
+#         model = torch.jit.load("model_scripted.pth")
+#         model.to(device)
+#         model.eval()
 
-        visualize, fig = validate(model, set_dataloader, prediction_bar)
-        st.dataframe(visualize)
-        st.plotly_chart(fig)
+#         visualize, fig = validate(model, set_dataloader, prediction_bar)
+#         st.dataframe(visualize)
+#         st.plotly_chart(fig)
 
