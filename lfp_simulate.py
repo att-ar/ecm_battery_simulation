@@ -109,8 +109,8 @@ def lfp_cell(capacity: float, delta_t: float,
         if (soc[i] >= 99.9 and current[i] > 0.0) or \
            (soc[i] <= 0.3 and current[i] < 0.0):
 
-            slice1 = min(len(current), i + 2000)
-            slice2 = min(len(current), i + 12000)
+            slice1 = min(len(current), i + 750)
+            slice2 = min(len(current), i + 3600)
             mask1 = [0.0] * (slice1 - i)
             current[i: slice1] = mask1
             mask2 = current[slice1: slice2].copy() * -1.0
@@ -174,9 +174,11 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
         current[0] *= -1
     if current[0] >= -5.0:
         current[0] *= 2
-    current_list= [0.0,-6.0]
-    for i in range(len(current)):
-        current_list.extend([current[i]] * int(5500 // (i+1) ** 0.4))
+    current_list= [0.0,-capacity]
+    #ensures a sweep from 100 SOC to 0 SOC, which is industry norm,
+    #and required for my model to function well
+    for i in range(1, len(current)):
+        current_list.extend([current[i]] * int(3600 // (i) ** 0.4))
 
     df_sim= pd.DataFrame(columns={"current", "voltage", "soc"})
     df_sim["current"]= current_list
