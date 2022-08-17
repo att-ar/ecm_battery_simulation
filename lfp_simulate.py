@@ -11,12 +11,18 @@ import numpy as np
 from numpy.polynomial import Polynomial as P
 import pandas as pd
 
+import torch
+from torch import nn
+from torch.utils.data import DataLoader, Dataset
+
+from rolling_and_plot import normalize, rolling_split, validate
+
 st.title("Lithium-Ion Cell Simulator Using the 2nd Order Equivalent Circuit Model")
 st.markdown(
     "The purpose of this simulator is to generate SOC, Voltage, and Current data for lithium-ion cells.")
 st.markdown("Open Sidebar for Static ECM Parameterization.")
 
-tab = st.tabs(["Simulation","DataFrame","Graphs"])
+tab = st.tabs(["Simulation","DataFrame","Graphs","LSTM Predictions"])
 
 sidebar = st.sidebar
 with sidebar:  # the sidebar of the GUI
@@ -305,3 +311,32 @@ if start:
 #                                 4)))
 #     fig.tight_layout()
 #     st.pyplot(fig)
+
+#-----------------------------------
+# LSTM Model
+class BatterySet(Dataset):
+    def __init__(self, x: np.ndarray, y: np.ndarray):
+    
+        self.logits = torch.from_numpy(x.squeeze()).to(device)
+        self.labels = torch.from_numpy(y).to(device)
+        
+    def __len__(self):
+        return len(self.labels)
+    
+    def __getitem__(self, idx):
+        return (self.logits[idx], self.labels[idx])
+
+with tab[3]:
+    prediction_bar = st.progress(0)
+    df_sim_norm = normalize(df_sim)
+    x_set, y_set = rolling_split(df_sim_norm, 32, train = False)
+    set_dataloader = BatterySet(x_set, y_set)
+    set_dataloader = DataLoader(set_dataloader, batch_size=16, shuffle=False, drop_last = True)
+    
+    model = torch.jit.load("model_scripted.pth")
+    model.eval()
+    
+    visualize, fig = validate(model, set_dataloader, prediction_bar, dev = False)
+    st.dataframe(visualize)
+    st.plotly_chart(fig)
+    
