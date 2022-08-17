@@ -15,7 +15,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
-from rolling_and_plot.py import *
+from rolling_and_plot import normalize, rolling_split, validate
 
 st.title("Lithium-Ion Cell Simulator Using the 2nd Order Equivalent Circuit Model")
 st.markdown(
