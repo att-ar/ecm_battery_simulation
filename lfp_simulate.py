@@ -16,7 +16,6 @@ from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 
 from rolling_and_plot import normalize, rolling_split, validate
-from finetune import *
 
 device = torch.device("cpu")
 
