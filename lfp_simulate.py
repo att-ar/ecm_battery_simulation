@@ -310,7 +310,7 @@ if start:
         loss_fn = LogCoshLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr = 2e-7)
         for epoch in range(2):
-            train_loop(train_dataloader, model, loss_fn, optimizer, tuning_bar)
+            train_loop(tune_dataloader, model, loss_fn, optimizer, tuning_bar)
 
         model.eval()
         with lstm_cols[0]:
