@@ -307,11 +307,9 @@ if start:
             x_out, (h_n_lstm, c_n)  = self.lstm(x)
             out = self.linear_stack(h_n_lstm.squeeze())
             return out
-            
+
     with tab[2]:
         with st.container():
-            "Model Fine-Tuning Progress"
-            tuning_bar = st.progress(0)
             "Prediction Progress"
             prediction_bar = st.progress(0)
 
