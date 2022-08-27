@@ -9,8 +9,6 @@ import pandas as pd
 import torch
 from torch import nn
 from torch.nn.modules.activation import Sigmoid
-from torch.utils.data import DataLoader, Dataset
-from torchvision.transforms import ToTensor, Lambda
 
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler
 from sklearn.model_selection import train_test_split
@@ -18,6 +16,7 @@ from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 
 from rolling_and_plot import normalize, rolling_split, validate
+from finetune import *
 
 device = torch.device("cpu")
 
@@ -219,7 +218,7 @@ if start:
     assert(abs(min_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     assert(abs(max_I) < capacity / 1.2, "Current cannot exceed C/1.2")
     current = np.array((max_I - min_I) * np.random.random_sample(24) + min_I).round(2)
-    
+
     with tab[0]:
         "Progress Bar:"
         progress = st.progress(0)
@@ -230,11 +229,11 @@ if start:
                      )
 
     csv = convert_df(df_sim)
-    
+
     with tab[0]:
         "Check the other Tabs for more!"
         st.dataframe(data = df_sim)
-        
+
 
     with sidebar:
         file_name = st.text_input(label = "File name for csv", value = "simulated_data.csv")
@@ -253,7 +252,7 @@ if start:
     two["data"][0]["line"]["color"] = "pink"
     three = px.line(data_frame = df_sim, x = "time", y = "current", title = "Current v Time")
     three["data"][0]["line"]["color"] = "lightgreen"
-    
+
     with tab[1]:
         st.plotly_chart(one)
         st.plotly_chart(two)
@@ -287,43 +286,35 @@ if start:
 
     #-----------------------------------
     # LSTM Model
-    class LSTMNetwork(nn.Module):
-        def __init__(self):
-            super(LSTMNetwork, self).__init__()
-            self.lstm = nn.LSTM(3, 256, 1, batch_first = True)
-            self.linear_stack = nn.Sequential(
-                nn.Linear(256, 256),
-                nn.BatchNorm1d(256, momentum = 0.92),
-                nn.ReLU(),
-                nn.Dropout(0.2),
-                nn.Linear(256, 256),
-                nn.BatchNorm1d(256, momentum = 0.92),
-                nn.ReLU(),
-                nn.Dropout(0.2),
-                nn.Linear(256, 1),
-                Sigmoid()
-            )
-        def forward(self, x):
-            #lstm
-            x_out, (h_n_lstm, c_n)  = self.lstm(x)
-            out = self.linear_stack(h_n_lstm.squeeze())
-            return out
-        
+
     with tab[2]:
-        "Progress Bar"
         with st.container():
+            "Model Fine-Tuning Progress"
+            tuning_bar = st.progress(0)
+            "Prediction Progress"
             prediction_bar = st.progress(0)
+
         lstm_cols = st.columns(2)
+
         df_sim_norm = normalize(df_sim)
         x_set, y_set = rolling_split(df_sim_norm)
+
+        tune_dataloader = [set for set in zip(x_set[:3600], y_set[:3600])]
         set_dataloader = [set for set in zip(x_set,y_set)]
 
         model = LSTMNetwork().to(device)
         model.load_state_dict(torch.load("sim_model_state_dict.pth", map_location = device))
+        #fine-tuning of model:
+        model.train()
+
+        loss_fn = LogCoshLoss()
+        optimizer = torch.optim.Adam(model.parameters(), lr = 2e-7)
+        for epoch in range(2):
+            train_loop(train_dataloader, model, loss_fn, optimizer, tuning_bar)
+
         model.eval()
         with lstm_cols[0]:
             visualize, fig = validate(model, set_dataloader, prediction_bar)
             st.dataframe(visualize)
         with lstm_cols[1]:
             st.plotly_chart(fig)
-
