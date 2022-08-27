@@ -286,7 +286,28 @@ if start:
 
     #-----------------------------------
     # LSTM Model
-
+    class LSTMNetwork(nn.Module):
+        def __init__(self):
+            super(LSTMNetwork, self).__init__()
+            self.lstm = nn.LSTM(3, 256, 1, batch_first = True)
+            self.linear_stack = nn.Sequential(
+                nn.Linear(256, 256),
+                nn.BatchNorm1d(256, momentum = 0.92),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(256, 256),
+                nn.BatchNorm1d(256, momentum = 0.92),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(256, 1),
+                Sigmoid()
+        )
+        def forward(self, x):
+            #lstm
+            x_out, (h_n_lstm, c_n)  = self.lstm(x)
+            out = self.linear_stack(h_n_lstm.squeeze())
+            return out
+            
     with tab[2]:
         with st.container():
             "Model Fine-Tuning Progress"
@@ -298,19 +319,10 @@ if start:
 
         df_sim_norm = normalize(df_sim)
         x_set, y_set = rolling_split(df_sim_norm)
-
-        tune_dataloader = [set for set in zip(x_set[:3600], y_set[:3600])]
         set_dataloader = [set for set in zip(x_set,y_set)]
 
         model = LSTMNetwork().to(device)
         model.load_state_dict(torch.load("sim_model_state_dict.pth", map_location = device))
-        #fine-tuning of model:
-        model.train()
-
-        loss_fn = LogCoshLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr = 2e-7)
-        for epoch in range(2):
-            train_loop(tune_dataloader, model, loss_fn, optimizer, tuning_bar)
 
         model.eval()
         with lstm_cols[0]:
