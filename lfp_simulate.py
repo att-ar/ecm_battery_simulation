@@ -314,7 +314,7 @@ if start:
 
         lstm_cols = st.columns(2)
 
-        df_sim_norm = normalize(df_sim)
+        df_sim_norm = normalize(df_sim, capacity)
         x_set, y_set = rolling_split(df_sim_norm)
         set_dataloader = [set for set in zip(x_set,y_set)]
 
