@@ -320,7 +320,7 @@ if start:
         set_dataloader = [set for set in zip(x_set,y_set)]
 
         model = LSTMNetwork().to(device)
-        model.load_state_dict(torch.load("sim_model_state_dict.pth", map_location = device))
+        model.load_state_dict(torch.load("crate_model_state_dict.pth", map_location = device))
 
         model.eval()
         with lstm_cols[0]:

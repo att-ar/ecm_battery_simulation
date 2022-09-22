@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 params.csv
 The-circuit-of-the-second-order-RC-model.png
+.DS_Store
