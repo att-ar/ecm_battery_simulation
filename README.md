@@ -11,9 +11,9 @@ subjected to different current profiles.
 
 $2^{nd}$ order:
 
-$$ U_{1,k+1} = exp(-\Delta t/\tau_1)\cdot U_{1,k} + R_1[1 - exp(-\Delta t/\tau_1)]\cdot I_k $$
+$$ U_{1,k+1} = exp(-\Delta t/\tau_1)\cdot U_{1,k} + R_1(1 - exp(-\Delta t/\tau_1))\cdot I_k $$
 
-$$ U_{2,k+1} = exp(-\Delta t/\tau_2)\cdot U_{2,k} + R_2[1 - exp(-\Delta t/\tau_2)]\cdot I_k $$
+$$ U_{2,k+1} = exp(-\Delta t/\tau_2)\cdot U_{2,k} + R_2(1 - exp(-\Delta t/\tau_2))\cdot I_k $$
 
 $$ \tau_1 = R_1C_1 $$
 

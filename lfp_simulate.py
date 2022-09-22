@@ -16,7 +16,6 @@ from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 
 from rolling_and_plot import normalize, rolling_split, validate
-from finetune import *
 
 device = torch.device("cpu")
 
@@ -315,7 +314,7 @@ if start:
 
         lstm_cols = st.columns(2)
 
-        df_sim_norm = normalize(df_sim)
+        df_sim_norm = normalize(df_sim, capacity)
         x_set, y_set = rolling_split(df_sim_norm)
         set_dataloader = [set for set in zip(x_set,y_set)]
 
