@@ -28,17 +28,17 @@ tab = st.tabs(["Simulation","Graphs","LSTM Predictions"])
 
 sidebar = st.sidebar
 with sidebar:  # the sidebar of the GUI
-    r_int = st.number_input(label="Internal Resistance mΩ", value = 2.3) / 1000
+    r_int = st.number_input(label="Internal Resistance mΩ", value = 1.3) / 1000
     # RC-pairs for 2nd order ECM
     rc = st.columns(2)
     with rc[0]:
         r_1 = st.number_input(
-            label="Resistance of R1 mΩ", value=2.7) / 1000
+            label="Resistance of R1 mΩ", value=1.20) / 1000
         c_1 = st.number_input(
             label="Capacitance of C1 F", value=12000)
     with rc[1]:
         r_2 = st.number_input(
-            label="Resistance of R2 mΩ", value=2.1) / 1000
+            label="Resistance of R2 mΩ", value=1.0) / 1000
         c_2 = st.number_input(
             label="Capacitance of C2 F", value=120000)
 
@@ -47,7 +47,7 @@ with sidebar:  # the sidebar of the GUI
     if not c_2:
         assert(c_1 != 0, "Change 1st RC pair first")
 
-    capacity = st.number_input(label="Battery Capacity in Ah", value=18.254)
+    capacity = st.number_input(label="Battery Capacity in Ah", value=19)
 
     ocv = st.text_input(
         label="11 OCV values from 100 to 0 SOC split by commas:")
@@ -57,11 +57,11 @@ with sidebar:  # the sidebar of the GUI
     with cur[0]:
         min_I = st.number_input(
                     label = "Most (-) current (A)",
-                    value = -1.0, max_value = 0.0)
+                    value = -10.0, max_value = 0.0)
     with cur[1]:
         max_I = st.number_input(
                     label = "Most (+) current (A)",
-                    value = 1.0, min_value = 0.0)
+                    value = 10.0, min_value = 0.0)
 
     start = st.checkbox(label="Run Simulation")
 
