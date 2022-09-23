@@ -178,7 +178,7 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
     for i in range(len(current)):
         current_list.extend([current[i]] * int(3000 // (i+1) ** 0.4))
 
-    df_sim= pd.DataFrame(columns={"current", "voltage", "soc"})
+    df_sim= pd.DataFrame(columns=["current", "voltage", "soc"])
     df_sim["current"]= current_list
 
     # generate soc ahead of time
