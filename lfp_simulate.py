@@ -47,7 +47,7 @@ with sidebar:  # the sidebar of the GUI
     if not c_2:
         assert(c_1 != 0, "Change 1st RC pair first")
 
-    capacity = st.number_input(label="Battery Capacity in Ah", value=19)
+    capacity = st.number_input(label="Battery Capacity in Ah", value=20.0)
 
     ocv = st.text_input(
         label="11 OCV values from 100 to 0 SOC split by commas:")
