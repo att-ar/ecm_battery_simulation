@@ -223,9 +223,12 @@ if start:
         progress = st.progress(0)
 
     #sim
-    df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
-                      r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
-                     )
+    try:
+        del df_sim
+    except NameError:
+        df_sim = simulate(capacity, current, progress, ocv = ocv, r_int = r_int,
+                          r_1 = r_1, c_1 = c_1, r_2 = r_2, c_2 = c_2
+                         )
 
     csv = convert_df(df_sim)
 
