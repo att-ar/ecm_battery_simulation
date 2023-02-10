@@ -1,7 +1,7 @@
-schemdraw
 numpy
 pandas
 plotly
 torch
 torchvision
 scikit-learn
+datetime
