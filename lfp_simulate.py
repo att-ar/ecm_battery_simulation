@@ -3,14 +3,8 @@ import plotly.express as px
 
 from datetime import datetime
 
-import torch
-from torch import nn
-from torch.nn.modules.activation import Sigmoid
-
 from rolling_and_plot import normalize, rolling_split, validate
 from ecm_model import *
-
-device = torch.device("cpu")
 
 st.title("Lithium-Ion Cell Simulator Using the 2nd Order Equivalent Circuit Model")
 st.markdown(
@@ -59,7 +53,7 @@ with sidebar:  # the sidebar of the GUI
 
 #------------------------------
 #converting dataframes to csv/parquet
-@st.cache
+@st.cache_data
 def convert_df(df, format = "csv"):
     if format == "parquet":
         return df.to_parquet()
@@ -158,29 +152,7 @@ if start:
 #     st.pyplot(fig)
 
     #-----------------------------------
-    # LSTM Model
-    class LSTMNetwork(nn.Module):
-        def __init__(self):
-            super(LSTMNetwork, self).__init__()
-            self.lstm = nn.LSTM(3, 256, 1, batch_first = True)
-            self.linear_stack = nn.Sequential(
-                nn.Linear(256, 256),
-                nn.BatchNorm1d(256, momentum = 0.92),
-                nn.ReLU(),
-                nn.Dropout(0.2),
-                nn.Linear(256, 256),
-                nn.BatchNorm1d(256, momentum = 0.92),
-                nn.ReLU(),
-                nn.Dropout(0.2),
-                nn.Linear(256, 1),
-                Sigmoid()
-        )
-        def forward(self, x):
-            #lstm
-            x_out, (h_n_lstm, c_n)  = self.lstm(x)
-            out = self.linear_stack(h_n_lstm.squeeze())
-            return out
-
+    #LSTM
     with tab[2]:
         with st.container():
             "Prediction Progress"
@@ -192,10 +164,7 @@ if start:
         x_set, y_set = rolling_split(df_sim_norm)
         set_dataloader = [set for set in zip(x_set,y_set)]
 
-        model = LSTMNetwork().to(device)
-        model.load_state_dict(torch.load("crate_model_state_dict.pth", map_location = device))
-
-        model.eval()
+        model = load_model()
         with lstm_cols[0]:
             visualize, fig = validate(model, set_dataloader, prediction_bar)
             st.dataframe(visualize)

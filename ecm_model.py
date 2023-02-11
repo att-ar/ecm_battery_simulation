@@ -4,6 +4,13 @@ import numpy as np
 from numpy.polynomial import Polynomial as P
 import pandas as pd
 
+import torch
+from torch import nn
+from torch.nn.modules.activation import Sigmoid
+
+device = torch.device("cpu")
+
+@st.cache_data
 def generate_ocv_curve(ocv: list):
     '''
     numpy.polynomial.Polynomial.fit
@@ -69,7 +76,6 @@ def lfp_cell(capacity: float, delta_t: float,
     return pd.DataFrame(data={"current": current,
                               "voltage": model_v,
                               "soc": soc})
-
 
 def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
     '''
@@ -138,3 +144,33 @@ def simulate(capacity, current, progress, delta_t=1.0, **kwargs):
     df_sim["time"] = [round(t * delta_t,1) for t in range(len(df_sim))]
 
     return df_sim
+
+class LSTMNetwork(nn.Module):
+        def __init__(self):
+            super(LSTMNetwork, self).__init__()
+            self.lstm = nn.LSTM(3, 256, 1, batch_first = True)
+            self.linear_stack = nn.Sequential(
+                nn.Linear(256, 256),
+                nn.BatchNorm1d(256, momentum = 0.92),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(256, 256),
+                nn.BatchNorm1d(256, momentum = 0.92),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+                nn.Linear(256, 1),
+                Sigmoid()
+        )
+        def forward(self, x):
+            #lstm
+            x_out, (h_n_lstm, c_n)  = self.lstm(x)
+            out = self.linear_stack(h_n_lstm.squeeze())
+            return out
+
+@st.cache_resource
+def load_model():
+    model = LSTMNetwork().to(device)
+    model.load_state_dict(torch.load("crate_model_state_dict.pth", map_location = device))
+    model.eval()
+    return model
+
